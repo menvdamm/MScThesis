@@ -146,9 +146,7 @@ def make_df(fasta, metadata):
     return df
 
 complete_df = make_df('./Data/Aligned/SARSCoV2.fasta', metadata)
-
-with open('./Data/Dataframes/complete_df.json', 'w') as file:
-    json.dump(complete_df, file)
+complete_df.to_csv('./Data/Dataframes/complete_df.csv', index = False)
     
 #%% Identifying rare insertions, allowed gap percentage
 
@@ -174,8 +172,24 @@ def ungap_df(df, allowed_gap_percentage):
     return df
 
 df = ungap_df(complete_df, allowed_gap_percentage)
+df.to_csv('./Data/Dataframes/df.csv', index = False)
 
-with open('./Data/Dataframes/df.json', 'w') as file:
-    json.dump(df, file)
+#%% Scoring 39 nucleotide regions
 
-        
+def score_window(df, size):
+    Begin = pd.Series(list(range(0, len(df)-size+1)))
+    End = pd.Series(list(range(size-1, len(df))))
+    Mut_scores = pd.Series([sum(df['Mutability'][begin:end+1]) for begin, end in zip(Begin, End)])
+    Ent_scores = pd.Series([sum(df['Shannon_entropy'][begin:end+1]) for begin, end in zip(Begin, End)])
+    Gap_scores = pd.Series([sum(df['Gap_percentage'][begin:end+1]) for begin, end in zip(Begin, End)])
+    score_df = pd.DataFrame({'Begin_position': Begin + 1,
+                             'End_position': End + 1,     
+                             'Mutability': Mut_scores,
+                             'Shannon_entropy_score': Ent_scores,
+                             'Gap_percentage': Gap_scores})
+    score_df = score_df.sort_values('Mutability')
+    return score_df  
+
+score_df = score_window(df, 39)
+score_df.to_csv('./Data/Dataframes/score_df.csv', index = False)
+
