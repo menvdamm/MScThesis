@@ -6,7 +6,7 @@ Created on Tue Oct 12 13:11:11 2021
 @author: mennovandamme
 """
 
-#### Displaying the animated mutation figures
+#### Displaying the data
 
 #%% Dependencies
 

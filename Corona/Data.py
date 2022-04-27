@@ -6,7 +6,7 @@ Created on Sat Oct  2 12:08:06 2021
 @author: mennovandamme
 """
 
-#### Clean and store the sequence data and metadata
+#### Download, clean and store the sequence data and metadata
 
 
 #%% Dependencies

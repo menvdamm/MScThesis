@@ -23,3 +23,5 @@ Corona/Data/NCBI/SARSCoV2.fasta
 Corona/Data/NCBI/ncbi_dataset.zip
 Corona/Data/Metadata/complete_metadata.json
 Corona/Data/Metadata/metadata.json
+Corona/Data/Clean/SARSCoV2.fasta
+.DS_Store
