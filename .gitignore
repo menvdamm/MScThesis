@@ -11,3 +11,15 @@ Corona/.DS_Store
 .DS_Store
 .DS_Store
 Corona/Data/Aligned/SARSCoV2.fasta
+.DS_Store
+.DS_Store
+.DS_Store
+Influenza/.DS_Store
+Corona/Data/NCBI/ncbi_dataset/data/genomic.fna
+Corona/Data/NCBI/ncbi_dataset/data/dataset_catalog.json
+Corona/Data/NCBI/ncbi_dataset/data/data_report.jsonl
+Corona/Data/NCBI/ncbi_dataset/data/biosample.jsonl
+Corona/Data/NCBI/SARSCoV2.fasta
+Corona/Data/NCBI/ncbi_dataset.zip
+Corona/Data/Metadata/complete_metadata.json
+Corona/Data/Metadata/metadata.json

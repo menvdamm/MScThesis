@@ -28,48 +28,34 @@ with open('./Data/Metadata/metadata.json', 'r') as file:
 
 def sort_IDs_by_date(IDs, metadata):
     date_IDs = {}
-    IDs_sorted = [] 
-    
+    IDs_sorted = []    
     if len(IDs) == 1:
         return IDs
     else:
-        
         for ID in IDs:
             Year = metadata[ID]['Year']
             Month = metadata[ID]['Month']
             Day = metadata[ID]['Day']
-            
-            # if the day is unknown set to middle of the month (15th)
-            # if month is unknown set to middle of the year (1st of July)
-            if Month == 'unknown':
-                if Day == 'unknown':
-                    Month = 7
-                    Day = 1
-                else:
-                    Day = 15
-
             if Year not in date_IDs:
                 date_IDs[Year] = {}
             if Month not in date_IDs[Year]:
                 date_IDs[Year][Month] = {}
             if Day not in date_IDs[Year][Month]:
                 date_IDs[Year][Month][Day] = []
-            
             date_IDs[Year][Month][Day].append(ID)
-            
         for Year in sorted(date_IDs.keys()):
             for Month in sorted(date_IDs[Year].keys()):
                 for Day in sorted(date_IDs[Year][Month].keys()):
-                    IDs_sorted.append(ID)
-                    
+                    for ID in date_IDs[Year][Month][Day]:
+                        IDs_sorted.append(ID)  
     return IDs_sorted
         
 #%% Complete dataframe per segment
 
 def make_df(fasta, metadata):
     seq_dict = SeqIO.index(fasta, 'fasta')
-    IDs_sorted = sort_IDs_by_date(metadata.keys(), metadata)
-    oldest_seq = IDs_sorted[0]
+    IDs_sorted = sort_IDs_by_date(list(metadata.keys()), metadata)
+    oldest_seq = str(seq_dict[IDs_sorted[0]].seq)
     seq_length = len(oldest_seq)
     Positions = list(range(1, seq_length + 1))
     seq_count = 0
@@ -155,14 +141,15 @@ def find_rare_insertions(complete_df, metadata):
     for ID in metadata:
         tot_length += metadata[ID]['Seq_length']    
     avg_length = int(tot_length/len(metadata)) 
-    for allowed_gap_percentage in range(0, 101):
+    for allowed_gap_percentage in list(range(100, 0, -1)):
         smaller = complete_df['Gap_percentage'] < allowed_gap_percentage
-        df_length = smaller.sum()[0]
-        if df_length >= avg_length:
+        df_length = smaller.sum()
+        if df_length <= avg_length:
             break  
     return avg_length, df_length, allowed_gap_percentage
 
 avg_length, df_length, allowed_gap_percentage = find_rare_insertions(complete_df, metadata)
+# 29784, 29783, 45
 
 #%% Ungapped dataframe per segment
 
@@ -185,7 +172,7 @@ def score_window(df, size):
     score_df = pd.DataFrame({'Begin_position': Begin + 1,
                              'End_position': End + 1,     
                              'Mutability': Mut_scores,
-                             'Shannon_entropy_score': Ent_scores,
+                             'Shannon_entropy': Ent_scores,
                              'Gap_percentage': Gap_scores})
     score_df = score_df.sort_values('Mutability')
     return score_df  
