@@ -178,5 +178,5 @@ for ID in metadata_clean:
     metadata_clean[ID]['Duplicate_IDs'] = dupes[ID]
     metadata_clean[ID]['Duplicate_count'] = len(dupes[ID])
 
-with open('./Data/Metadata/metadata.json', 'w') as file:
-    json.dump(metadata_clean, file)
+with open('./Data/Metadata/metadata.json', 'w') as f:
+    json.dump(metadata_clean, f)

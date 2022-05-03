@@ -167,7 +167,13 @@ for var in ['Mutability', 'Shannon_entropy']:
 #                name = '39 bp',
                 line = dict(color = 'blue', width = 6),
                 showlegend = False))
-   
+
+fig.update_layout(
+    title_text = 'Shannon entropy per position for SARS-CoV-2',
+    yaxis = {'title': 'Shannon entropy'},
+    xaxis = {'title': 'Position'}
+    )
+
 fig.show()
 
 #%% Bar charts per 39b
@@ -213,13 +219,13 @@ fig.update_traces(marker_color = 'black',
 fig.update_layout(
     title_text = 'Shannon entropy per 39b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
-    xaxis = {'title': 'Begin_position'}
+    xaxis = {'title': 'Begin position'}
     )
 
 # showing the Graph in browser
 fig.show()
 
-#%% Histograms
+#%% Histograms per 39 bp
     
 fig = px.histogram(score_df['Mutability'], nbins = 300)
 
@@ -242,7 +248,7 @@ fig.update_layout(
 
 fig.show()
 
-#%% Correlation between scores
+#%% Correlation between scores per 39 bp
 
 fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy") #, trendline="ols")
 
@@ -250,6 +256,42 @@ fig.update_layout(
     title_text = 'Shannon entropy in function of Mutability per 39b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
+    )
+
+fig.show()
+
+#%% RNA structure color histograms
+
+
+colors = df.sort_values('Position')['Mutability'].copy()
+log_colors = np.log10(colors + 1)/max(np.log10(colors + 1))
+
+fig = px.histogram(log_colors, nbins = 300)
+
+fig.update_layout(
+    title_text = 'Color histogram for for SARS-CoV-2',
+    yaxis = {'title': 'Count'},
+    xaxis = {'title': 'Color'}
+    )
+
+fig.show()
+
+#%% Element structure Box plot
+
+df['Element'] = df['Element'].replace({"f": "5' unpaired",                
+                                       "i": "interior loop & bulge",
+                                       "s": "stem",
+                                       "m": "multiloop",
+                                       "h": "hairpin loop",
+                                       "t": "3' unpaired"
+                                       })
+
+fig = px.box(df, x="Element", y="Shannon_entropy")
+
+fig.update_layout(
+    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
+    yaxis = {'title': 'Shannon entropy'},
+    xaxis = {'title': 'Structure element'}
     )
 
 fig.show()

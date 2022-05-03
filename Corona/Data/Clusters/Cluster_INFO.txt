@@ -1,0 +1,48 @@
+	Identity: 0.9995 
+		clusters: 14684
+		max_seq: 58819
+		min_seq: 0
+	Identity: 0.9985 
+		clusters: 301
+		max_seq: 148697
+		min_seq: 0
+	Identity: 0.998 
+		clusters: 185
+		max_seq: 243443
+		min_seq: 0
+	Identity: 0.9975 
+		clusters: 143
+		max_seq: 246232
+		min_seq: 0
+	Identity: 0.995 
+		clusters: 81
+		max_seq: 248315
+		min_seq: 0
+	Identity: 0.99 
+		clusters: 57
+		max_seq: 249218
+		min_seq: 0
+Identity: 0.9995 
+		clusters: 14684
+		max_seq: 58819
+		min_seq: 0
+Identity: 0.9985 
+		clusters: 301
+		max_seq: 148697
+		min_seq: 0
+Identity: 0.998 
+		clusters: 185
+		max_seq: 243443
+		min_seq: 0
+Identity: 0.9975 
+		clusters: 143
+		max_seq: 246232
+		min_seq: 0
+Identity: 0.995 
+		clusters: 81
+		max_seq: 248315
+		min_seq: 0
+Identity: 0.99 
+		clusters: 57
+		max_seq: 249218
+		min_seq: 0

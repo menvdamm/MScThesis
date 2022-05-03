@@ -13,11 +13,8 @@ Created on Tue Nov  2 17:47:36 2021
 # conda activate Masterproef
 # conda install pip
 # /opt/anaconda3/envs/Masterproef/bin/pip install forgi
-import forgi
-import json, subprocess, os, time
+import json, subprocess, os
 import pandas as pd
-import numpy as np
-import statsmodels
 from scipy.stats import chisquare
 import plotly.express as px
 

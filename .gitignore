@@ -25,3 +25,10 @@ Corona/Data/Metadata/complete_metadata.json
 Corona/Data/Metadata/metadata.json
 Corona/Data/Clean/SARSCoV2.fasta
 .DS_Store
+Corona/Data/Alignment/SARSCoV2.fasta
+Corona/Data/Clusters/SARSCoV2_99.fasta
+Corona/Data/Clusters/SARSCoV2_995.fasta
+Corona/Data/Clusters/SARSCoV2_9975.fasta
+Corona/Data/Clusters/SARSCoV2_998.fasta
+Corona/Data/Clusters/SARSCoV2_9985.fasta
+Corona/Data/Clusters/SARSCoV2_9995.fasta

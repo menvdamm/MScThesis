@@ -131,7 +131,7 @@ def make_df(fasta, metadata):
     df['Position'] = df['Position'].astype('int64')
     return df
 
-complete_df = make_df('./Data/Aligned/SARSCoV2.fasta', metadata)
+complete_df = make_df('./Data/Alignment/SARSCoV2.fasta', metadata)
 complete_df.to_csv('./Data/Dataframes/complete_df.csv', index = False)
     
 #%% Identifying rare insertions, allowed gap percentage

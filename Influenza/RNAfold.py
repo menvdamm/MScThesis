@@ -6,7 +6,7 @@ Created on Thu Oct  7 16:46:02 2021
 @author: mennovandamme
 """
 
-#### Pipeline to create 2D folding figure of the RNAs
+#### Pipeline to create 2D folding of the RNAs
 
 #%% Dependencies
 
