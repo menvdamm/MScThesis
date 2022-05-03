@@ -13,6 +13,7 @@ Created on Sat Apr 30 10:26:45 2022
 import subprocess, os
 import pandas as pd
 import numpy as np
+import forgi
 
 #%% Directories
 
