@@ -43,11 +43,9 @@ with open('./Data/Structure/SARSCoV2_consensus.fasta', 'w+') as file:
 # Extracting the centroid structure from the .ifold file
 
 with open('./Data/Structure/SARSCoV2.ifold', 'r') as f:
-    for line in f:
-        if re.search('[AUGC]+', line):
-            sequence = line.strip()#.split()[0]
-        elif re.search('[(\(\)\.]+', line):
-            structure = line.strip().split()[0]
+    lines = f.readlines()
+    sequence = lines[1].strip()
+    structure = lines[2].strip().split(' ')[0]
             
 # Making a file with sequence and structure
 
