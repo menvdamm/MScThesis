@@ -76,8 +76,13 @@ with open('./Data/Structure/colors.txt', 'w') as file:
 #   m = multiloop segment, single-stranded regions bewteen two stems. In the current version of forgi, pseudo-knots and exterior loops segments between stems are treated as multiloop segments.
 #   h = hairpin loop, closed loop at the end of a stem
 
-
 cmd = 'rnaConvert.py ./Data/Structure/SARSCoV2_structure.txt -T element_string --filename ./Data/Structure/SARSCoV2'
+subprocess.run(cmd, shell = True)
+
+# BEAR encoding
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4041456/
+
+cmd = 'cd ../Bear_Encoder | java -jar BEAR_Encoder.jar ../Corona/Data/SARSCoV2_structure.txt ../Corona/Data/SARSCoV2_element_structure.txt'
 subprocess.run(cmd, shell = True)
 
 #%% Adding element to conservation dataframe
