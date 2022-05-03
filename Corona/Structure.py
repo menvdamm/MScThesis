@@ -79,17 +79,17 @@ with open('./Data/Structure/colors.txt', 'w') as file:
 cmd = 'rnaConvert.py ./Data/Structure/SARSCoV2_structure.txt -T element_string --filename ./Data/Structure/SARSCoV2'
 subprocess.run(cmd, shell = True)
 
-# BEAR encoding
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4041456/
+#%% Adding structure element to conservation dataframe
 
-cmd = 'cd ../Bear_Encoder | java -jar BEAR_Encoder.jar ../Corona/Data/SARSCoV2_structure.txt ../Corona/Data/SARSCoV2_element_structure.txt'
-subprocess.run(cmd, shell = True)
-
-#%% Adding element to conservation dataframe
-
-with open('./Data/Structure/SARSCoV2.element_string') as file:
+with open('./Data/Structure/SARSCoV2001.element_string') as file:
     df['Element'] = list(file.readlines()[1].strip())
     df.to_csv('./Data/Dataframes/df.csv', index = False)
     
-
+df['Element'] = df['Element'].replace({"f": "5' unpaired",                
+                                       "i": "interior loop & bulge",
+                                       "s": "stem",
+                                       "m": "multiloop",
+                                       "h": "hairpin loop",
+                                       "t": "3' unpaired"
+                                       })
                 

@@ -278,14 +278,6 @@ fig.show()
 
 #%% Element structure Box plot
 
-df['Element'] = df['Element'].replace({"f": "5' unpaired",                
-                                       "i": "interior loop & bulge",
-                                       "s": "stem",
-                                       "m": "multiloop",
-                                       "h": "hairpin loop",
-                                       "t": "3' unpaired"
-                                       })
-
 fig = px.box(df, x="Element", y="Shannon_entropy")
 
 fig.update_layout(
