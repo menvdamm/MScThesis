@@ -11,6 +11,7 @@ Created on Tue Oct 12 13:11:11 2021
 #%% Dependencies
 
 import pandas as pd
+import numpy as np
 # conda install -c plotly plotly
 import plotly.express as px
 import plotly.graph_objects as go
@@ -264,7 +265,7 @@ fig.show()
 
 
 colors = df.sort_values('Position')['Mutability'].copy()
-log_colors = np.log10(colors + 1)/max(np.log10(colors + 1))
+log_colors = np.log10(colors*10000 + 1)/max(np.log10(colors*10000 + 1))
 
 fig = px.histogram(log_colors, nbins = 300)
 
