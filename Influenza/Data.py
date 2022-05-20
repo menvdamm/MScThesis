@@ -11,9 +11,9 @@ Created on Sat Oct  2 12:08:06 2021
 
 #%% Dependencies
 
-import re, json, time, os, subprocess, math, pickle
+import re, json, os, subprocess
 # conda install -c anaconda biopython
-from Bio import SeqIO, Entrez
+from Bio import SeqIO
 
 #%% Directories
 
