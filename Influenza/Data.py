@@ -23,41 +23,9 @@ if not os.path.isdir('./Data/Sorted'): os.mkdir('./Data/Sorted')
 if not os.path.isdir('./Data/Clean'): os.mkdir('./Data/Clean')
 if not os.path.isdir('./Data/Metadata'): os.mkdir('./Data/Metadata')
 
-#%% Regexes
-
-## regex to extract the virus type (A or B) from the virus name
-# Virus_name (column 7) looks like: 
-#   A: Influenza A virus (A/Arequipa/FLU3845/2006(H3)) 
-#   B: Influenza B virus (B/Jiangsu/10e9/2003)
-#   problem some viruses are unidentified: unidentified influenza virus
-
-Type_re = re.compile('^Influenza ([AB])')
-
-## regex to check for a correct date
-# some collection dates are year/month/date: 2011/01/20
-# others are year/month: 2011/05
-# others are : 1985
-# unwanted collection dates: empty ones ('') or 'unknown'
-
-Date_re = re.compile('^([0-9]+/*[0-9]*/*[0-9]*)')
-
-Month_re = re.compile('^[0-9]+/([0-9]+)/*[0-9]*')
-
-Day_re = re.compile('^[0-9]+/[0-9]+/([0-9]+)')
-
-## regex to extract the genbank acession ID from the seq_record.id/FASTA header
-# FASTA header looks like this:
-#   >gi|58576|gb|X52226|Influenza A virus (A/FPV/Rostock/34(H7N1)) gene for neuraminidase, genomic RNA
-# sequence record ID looks like this (first part of FASTA header):
-#   gi|222425131|gb|AB451147|Influenza
-
-ID_re = re.compile('^gi\|[0-9]+\|gb\|(.*)\|.*$')
-
 #%% Downloading Influenza NCBI database using rsync
 
 # donwload date: 11th of May
-
-t0 = time.time()
 
 ## Downloading the fasta and metadata files via Rsync
 # The (GNU zipped) files we need:
@@ -72,20 +40,36 @@ subprocess.run(cmd, shell = True)
 cmd = 'gunzip --force -r ./Data/NCBI'
 subprocess.run(cmd, shell = True)
 
-t1 = time.time()
-print('Downloading Influenza NCBI database took', round((t1-t0)/60, 1), 'minutes')
-# 
-
 #%% Reading in the metadata
 
-## loading in the metadata from influenza_na.dat
-# creating a Type and Year key
-# if the Type or Date is doesn't get recognize by regex set to 'unknown'
-
 metadata = {}
-no_date_IDs = []
+
+## regex to extract the virus type (A or B) from the virus name
+# Virus_name (column 7) looks like: 
+#   A: Influenza A virus (A/Arequipa/FLU3845/2006(H3)) 
+#   B: Influenza B virus (B/Jiangsu/10e9/2003)
+#   problem some viruses are unidentified: unidentified influenza virus
+Type_re = re.compile('^Influenza ([AB])')
+
+## regex to check for a correct date
+# some collection dates are year/month/date: 2011/01/20
+# others are year/month: 2011/05
+# others are : 1985
+# unwanted collection dates: empty ones ('') or 'unknown'
+Date_re = re.compile('^([0-9]+/*[0-9]*/*[0-9]*)')
+Month_re = re.compile('^[0-9]+/([0-9]+)/*[0-9]*')
+Day_re = re.compile('^[0-9]+/[0-9]+/([0-9]+)')
+
+# list of IDs without a known type (A or B)
 no_type_IDs = []
+
+# list of IDs without a complete date
+incomplete_date_IDs = []
+
+# list of IDs that are not from human host
 other_host_IDs = []
+
+# list of IDs that aren't complete sequences
 nc_IDs = []
 
 t0 = time.time()
@@ -107,15 +91,17 @@ with open('./Data/NCBI/influenza_na.dat', 'r') as file:
                     Day = int(Day_re.search(record[5]).group(1))
                 else:
                     Day = 'unknown'
+                    incomplete_date_IDs.append(ID)
             else:
                  Month = 'unknown'
                  Day = 'unknown'
+                 incomplete_date_IDs.append(ID)
         else:
             Date = 'unknown'
             Year = 'unknown'
             Month = 'unknown'
             Day = 'unknown'
-            no_date_IDs.append(ID)
+            incomplete_date_IDs.append(ID)
         Host = record[1]
         if Host != 'Human':
             other_host_IDs.append(ID)
@@ -137,56 +123,99 @@ with open('./Data/NCBI/influenza_na.dat', 'r') as file:
                         'Description': ''
                         }
 
+len(metadata)
+# 817587
+
+len(no_type_IDs)
+# 2142
+
+len(incomplete_date_IDs)
+# 132575
+
+len(other_host_IDs)
+# 324341
+
+len(nc_IDs)
+# 119520
+
 t1 = time.time()
 print('Reading in the metadata took:', round(t1-t0), 'seconds')
 
-#%% Reading in the sequence data and sorting them into separate files
+#%% Reading in the sequence data and sorting them into separate files per type and segment
 
-## make a list with the IDs that don't have an identified type or collection date
-bad_IDs = set(no_date_IDs + no_type_IDs + other_host_IDs + nc_IDs)
+## regex to extract the genbank acession ID from the seq_record.id/FASTA header
+# FASTA header looks like this:
+#   >gi|58576|gb|X52226|Influenza A virus (A/FPV/Rostock/34(H7N1)) gene for neuraminidase, genomic RNA
+# sequence record ID looks like this (first part of FASTA header):
+#   gi|222425131|gb|AB451147|Influenza
+ID_re = re.compile('^gi\|[0-9]+\|gb\|(.*)\|.*$')
 
-## sequence_sorter function:
-#   gives the sequences a new ID that is only the GenBank accession ID
-#   stores the sequence record description in the metadata dictionary
-#   remove the sequence record description so it doesn't get put in the output FASTA header
-#   sort them by influenza type (A or B) and by segment (1-8)
-#   write to separate fasta files to an output directory
-#   print the number of sequences in each file
+# set of unwanted IDs
+bad_IDs = set(no_type_IDs + incomplete_date_IDs + other_host_IDs + nc_IDs)
 
-def sequence_sorter(fasta_input, metadata):
+def sequence_sorter(fasta_input, metadata, bad_IDs):   
     for Type in ['A', 'B']:
         for Segment in list('12345678'):
-            locals()[Type+'_'+Segment] = []
-    
+            locals()[Type+'_'+Segment] = []   
     # sorting the sequence records into the correct lists
     for seq_record in SeqIO.parse(fasta_input, 'fasta'):
         ID = ID_re.search(seq_record.id).group(1)
         seq_record.id = ID
+        metadata[ID]['Description'] = seq_record.description
+        seq_record.description = ''
         if ID not in bad_IDs:
-            metadata[seq_record.id]['Description'] = seq_record.description
-            seq_record.description = ''
-            Host = metadata[seq_record.id]['Host']
             Type = metadata[seq_record.id]['Type']
             Segment = metadata[seq_record.id]['Segment']
-            locals()[Type+'_'+Segment].append(seq_record)
-            
-    # writing the sequence records into their fasta files   
+            locals()[Type+'_'+Segment].append(seq_record)            
+    # writing the sequence records into their fasta files & printing the counts
+    print('Sorted sequence counts:')
     for Type in ['A', 'B']:
         for Segment in list('12345678'):
-            SeqIO.write(locals()[Type+'_'+Segment], './Data/Sorted/'+Type+'_'+Segment+'.fasta', 'fasta')
-    
-    # print the number of sequences in each file
-    for Type in ['A', 'B']:
-        for Segment in list('12345678'):
-            print('\t'+Host+'_'+Type+'_'+Segment+':', len(locals()[Type+'_'+Segment]))
+            SeqIO.write(locals()[Type+'_'+Segment], './Data/Sorted/'+Type+'_'+Segment+'.fasta', 'fasta') 
+            print(Type+'_'+Segment+':', len(locals()[Type+'_'+Segment]))
 
-print('Sorted sequence counts:')
-sequence_sorter(fasta_input = './Data/NCBI/influenza.fna', metadata = metadata)                    
+sequence_sorter('./Data/NCBI/influenza.fna', metadata, bad_IDs)     
+
+# Sorted sequence counts BEFORE REMOVING INCOMPLETE DATE IDS:
+# A_1: 37111
+# A_2: 36421
+# A_3: 37378
+# A_4: 53777
+# A_5: 38357
+# A_6: 47288
+# A_7: 42567
+# A_8: 38602
+# B_1: 11104
+# B_2: 11145
+# B_3: 11118
+# B_4: 16146
+# B_5: 11220
+# B_6: 12743
+# B_7: 11245
+# B_8: 12411
+
+# Sorted sequence counts AFTER REMOVING INCOMPLETE DATE IDS:
+# A_1: 34556
+# A_2: 33826
+# A_3: 34792
+# A_4: 49567
+# A_5: 35675
+# A_6: 43561
+# A_7: 39422
+# A_8: 35806
+# B_1: 10933
+# B_2: 10973
+# B_3: 10943
+# B_4: 15398
+# B_5: 11037
+# B_6: 12378
+# B_7: 11043
+# B_8: 12188              
 
 with open('./Data/Metadata/metadata_complete.json', 'w') as file:
     json.dump(metadata, file)
 
-#%% Cleaning up the fasta files: 0 Ns and min length
+#%% Removing ambiguous IDs
 
 def sort_IDs_by_date(IDs, metadata):
     date_IDs = {}
@@ -198,56 +227,55 @@ def sort_IDs_by_date(IDs, metadata):
             Year = metadata[ID]['Year']
             Month = metadata[ID]['Month']
             Day = metadata[ID]['Day']
-            
-            # if the day is unknown set to middle of the month (15th)
-            # if month is unknown set to middle of the year (1st of July)
-            if Month == 'unknown':
-                if Day == 'unknown':
-                    Month = 7
-                    Day = 1
-                else:
-                    Day = 15
-
             if Year not in date_IDs:
                 date_IDs[Year] = {}
             if Month not in date_IDs[Year]:
                 date_IDs[Year][Month] = {}
             if Day not in date_IDs[Year][Month]:
                 date_IDs[Year][Month][Day] = []
-            
             date_IDs[Year][Month][Day].append(ID)
-            
         for Year in sorted(date_IDs.keys()):
             for Month in sorted(date_IDs[Year].keys()):
                 for Day in sorted(date_IDs[Year][Month].keys()):
-                    IDs_sorted.append(ID)  
+                    for ID in date_IDs[Year][Month][Day]:
+                        IDs_sorted.append(ID)  
     return IDs_sorted
 
+# list of IDs of sequences with ambiguous characters
 ambi_IDs = []
+
+# dict that keeps track of ambiguous sequence counts
 ambi_counts = {}
 for Type in ['A', 'B']:
     ambi_counts[Type] = {}
     for Segment in list('12345678'):
         ambi_counts[Type][Segment] = 0
+        
+# list of IDs of duplicate sequences
 duplicate_IDs = []
+
+# dict that keeps track of which sequence (oldest ID) has which duplicates (other IDs)
 dupes = {}
 
-## sequence_cleaner function:
-#   removes sequences which have too many ambiguous characters
-#   removes duplicate sequences
-#   returns a dictionary whith the oldest ID as key and it's duplicate IDs as values
-#   writes a new fasta file ontaining the cleaned up sequences with the oldest ID
-#   prints amount of sequences in the cleaned file
+# dict that keeps track of duplicate sequence counts
+dupe_counts = {}
+for Type in ['A', 'B']:
+    dupe_counts[Type] = {}
+    for Segment in list('12345678'):
+        dupe_counts[Type][Segment] = 0
 
 def sequence_cleaner(Type, Segment, metadata):
+    '''
+    removes sequences which have too many ambiguous characters
+    removes duplicate sequences
+    writes a new fasta file ontaining the cleaned up sequences with the oldest ID
+    '''
     sequences = {}
     input_file = './Data/Sorted/'+Type+'_'+Segment+'.fasta'
-    output_file = './Data/Clean/'+Type+'_'+Segment+'.fasta'
-    
+    output_file = './Data/Clean/'+Type+'_'+Segment+'.fasta'    
     for seq_record in SeqIO.parse(input_file, 'fasta'):
-        ID = seq_record.ID
-        seq = str(seq_record.seq).upper()
-        
+        ID = seq_record.id
+        seq = str(seq_record.seq).upper()        
         # if any charcter in the sequence is ambiguous append to list & count the amount per type/segment
         if any([i not in ['A', 'T', 'G', 'C'] for i in set(seq)]):
             ambi_IDs.append(ID)
@@ -255,65 +283,105 @@ def sequence_cleaner(Type, Segment, metadata):
         else:
             # add sequence as dict key (if not in dict) and the ID to value list
             if seq not in sequences: 
-                sequences[seq] = []
-            sequences[seq].append(ID) 
-            
-    with open(output_file, 'w') as output_file:
+                sequences[seq] = [ID]
+            else:
+                sequences[seq].append(ID)
+                dupe_counts[Type][Segment] += 1   
+    print(Type+'_'+Segment+':', len(sequences))                                   
+    with open(output_file, 'w') as f:
         for seq in sequences:
             IDs = sequences[seq]
             if len(IDs) == 1:
                 oldest_ID = IDs[0]
-                dupes[oldest_ID] = 
+                dupes[oldest_ID] = []
             else:
-                temp = {}
-                for ID in IDs:
-                    temp[ID] = metadata[ID]['Year']
-                oldest_ID = min(temp.items(), key = lambda item: item[1])[0]
-                duplicates = IDs.copy()
-                duplicates.remove(oldest_ID)
+                # find the oldest ID and keep that one
+                IDs_sorted = sort_IDs_by_date(IDs, metadata)
+                oldest_ID = IDs_sorted[0]
+                duplicates = IDs_sorted[1:]
                 duplicate_IDs.extend(duplicates)
                 dupes[oldest_ID] = duplicates            
-            output_file.write('>' + oldest_ID + '\n' + seq + '\n')        
-    print('\t'+Host+'_'+Type+'_'+Segment+':', len(sequences))
+            f.write('>' + oldest_ID + '\n' + seq + '\n')    
+    
 
-t0 = time.time()
 print('Cleaned sequence counts:')
-for Host in ['Human', 'Other']:
-    for Type in ['A', 'B']:
-        for Segment in list('12345678'):
-                sequence_cleaner(Host = Host, Type = Type, Segment = Segment,
-                                 metadata = metadata,
-                                 min_length = min_lengths[Type][Segment], 
-                                 max_ambiguous = 0)
-t1 = time.time()
-print('Cleaning up the sequences took:', round(t1-t0), 'seconds')
+for Type in ['A', 'B']:
+    for Segment in list('12345678'):
+        sequence_cleaner(Type, Segment, metadata)
 
+# Cleaned sequence counts:
+# A_1: 20188
+# A_2: 19603
+# A_3: 19793
+# A_4: 29435
+# A_5: 16980
+# A_6: 23232
+# A_7: 13121
+# A_8: 13133
+# B_1: 6320
+# B_2: 6162
+# B_3: 6446
+# B_4: 8776
+# B_5: 5874
+# B_6: 6778
+# B_7: 4540
+# B_8: 5559
+
+ambi_counts
+# {'A': 
+#  {'1': 2011,
+#   '2': 2016,
+#   '3': 1999,
+#   '4': 3440,
+#   '5': 1269,
+#   '6': 2892,
+#   '7': 1084,
+#   '8': 1085},
+#  'B': 
+#  {'1': 594,
+#   '2': 572,
+#   '3': 582,
+#   '4': 684,
+#   '5': 520,
+#   '6': 544,
+#   '7': 280,
+#   '8': 338}}
+
+# dupe_counts
+# {'A': 
+#  {'1': 12357,
+#   '2': 12207,
+#   '3': 13000,
+#   '4': 16692,
+#   '5': 17426,
+#   '6': 17437,
+#   '7': 25217,
+#   '8': 21588},
+#  'B': 
+#  {'1': 4019,
+#   '2': 4239,
+#   '3': 3915,
+#   '4': 5938,
+#   '5': 4643,
+#   '6': 5056,
+#   '7': 6223,
+#   '8': 6291}}
 
 #%% Making and storing a clean metadata dictionary
 
-t0 = time.time()
+bad_IDs = set(no_type_IDs + incomplete_date_IDs + other_host_IDs + nc_IDs + duplicate_IDs + ambi_IDs)
 
-## remove the IDs which:
-#   didn't meet the sequence_sorter requirements:have unidentified type or no collection date
-#   didn't meet the sequence_cleaner requirements: have Ns or are shorter than min_length
-
-bad_IDs = bad_IDs_ss + bad_IDs_sc + duplicate_IDs
 metadata_clean = metadata.copy()
+
 for ID in bad_IDs:
     del metadata_clean[ID]
 
 for ID in metadata_clean:
     metadata_clean[ID]['Duplicate_IDs'] = dupes[ID]
     metadata_clean[ID]['Duplicate_count'] = len(dupes[ID])
+  
+len(metadata_clean)
+# 376098
     
-
-## writing the dictionary to a .JSON file
-    
-with open('./Data/Metadata/metadata_clean.json', 'w') as file:
+with open('./Data/Metadata/metadata.json', 'w') as file:
     json.dump(metadata_clean, file, default = str)
-
-t1 = time.time()
-print('Making and storing a clean metadata dictionary took:', round(t1-t0), 'seconds')
-
-t3 = time.time()
-print('Data.py took', round((t3-t2)/60, 1), 'minutes')

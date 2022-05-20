@@ -67,7 +67,7 @@ def make_df(fasta, metadata):
     G_count = [0] * seq_length
     C_count = [0] * seq_length
     previous_seq = oldest_seq
-    
+   
     for ID in IDs_sorted:
         seq_record = seq_dict[ID]
         seq = str(seq_record.seq)
@@ -94,8 +94,7 @@ def make_df(fasta, metadata):
     G_ratio = np.divide(G_count, seq_count)
     C_ratio = np.divide(C_count, seq_count)
     
-    for i in range(seq_length):
-        
+    for i in range(seq_length):       
         if Gap_ratio[i] == 0:
             E_gap = 0
         else:
@@ -115,8 +114,7 @@ def make_df(fasta, metadata):
         if C_ratio[i] == 0:
             E_C = 0 
         else: 
-            E_C = C_ratio[i] * np.log2(C_ratio[i])
-            
+            E_C = C_ratio[i] * np.log2(C_ratio[i])           
         Entropy[i] = abs(- E_gap - E_A - E_T - E_G - E_C)
         
     df = pd.DataFrame({'Position': Positions,

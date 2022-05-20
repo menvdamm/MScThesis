@@ -11,7 +11,7 @@ Created on Sat Oct  2 12:08:06 2021
 
 #%% Dependencies
 
-import re, json, os, subprocess, pickle
+import re, json, os, subprocess
 # conda install -c anaconda biopython
 from Bio import SeqIO
 
@@ -77,23 +77,24 @@ len(no_date_IDs)
 len(metadata)
 # 1074845
 
-#%% Removing ambiguous sequences
+#%% Removing ambiguous sequences and sequences without collection data
 
-def remove_ambiguous(in_file, out_file, metadata):
+def remove_ambiguous_and_no_date(in_file, out_file, metadata, no_date_IDs):
     ambi_IDs = []
     with open(out_file, 'w') as output_file:
         for seq_record in SeqIO.parse(in_file, 'fasta'):
             ID = seq_record.id
-            seq = str(seq_record.seq).upper()
             metadata[ID]['Description'] = seq_record.description
-            # if any charcter in the sequence is ambiguous append to list & count the amount per type/segment
-            if any([i not in ['A', 'T', 'G', 'C'] for i in set(seq)]):
-                ambi_IDs.append(ID)
-            else:
-                output_file.write('>' + ID + '\n' + seq + '\n')  
+            if ID not in no_date_IDs:
+                seq = str(seq_record.seq).upper()
+                # if any charcter in the sequence is ambiguous append to list
+                if any([i not in ['A', 'T', 'G', 'C'] for i in set(seq)]):
+                    ambi_IDs.append(ID)
+                else:
+                    output_file.write('>' + ID + '\n' + seq + '\n')  
     return ambi_IDs
 
-ambi_IDs = remove_ambiguous('./Data/NCBI/ncbi_dataset/data/genomic.fna', './Data/NCBI/SARSCoV2.fasta', metadata)
+ambi_IDs = remove_ambiguous_and_no_date('./Data/NCBI/ncbi_dataset/data/genomic.fna', './Data/NCBI/SARSCoV2.fasta', metadata, no_date_IDs)
 
 with open('./Data/Metadata/complete_metadata.json', 'w') as file:
     json.dump(metadata, file)
@@ -101,7 +102,7 @@ with open('./Data/Metadata/complete_metadata.json', 'w') as file:
 len(ambi_IDs)
 # 580976
 
-#%% Cleaning up the fasta files: 0 Ns and min length
+#%% Removing duplicate sequences
 
 def sort_IDs_by_date(IDs, metadata):
     date_IDs = {}
@@ -128,14 +129,11 @@ def sort_IDs_by_date(IDs, metadata):
     return IDs_sorted
 
 def remove_duplicates(in_file, out_file, metadata):
-    i=0
     duplicate_IDs = []
     dupes = {}
     # dictionary to hold unique sequences as keys and IDs as values
     sequences = {}
     for seq_record in SeqIO.parse(in_file, 'fasta'):
-        i+=1
-        print(i)
         ID = seq_record.id
         seq = str(seq_record.seq).upper()
         if seq not in sequences: 
@@ -148,10 +146,10 @@ def remove_duplicates(in_file, out_file, metadata):
                 oldest_ID = IDs[0]
                 dupes[oldest_ID] = []
             else:
-                # find the oldest ID
+                # find the oldest ID and keep that one
                 IDs_sorted = sort_IDs_by_date(IDs, metadata)
                 oldest_ID = IDs_sorted[0]
-                duplicates = IDs_sorted[1:-1]
+                duplicates = IDs_sorted[1:]
                 duplicate_IDs.extend(duplicates)
                 dupes[oldest_ID] = duplicates            
             output_file.write('>' + oldest_ID + '\n' + seq + '\n')  
