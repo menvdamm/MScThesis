@@ -55,6 +55,8 @@ ID_re = re.compile('^gi\|[0-9]+\|gb\|(.*)\|.*$')
 
 #%% Downloading Influenza NCBI database using rsync
 
+# donwload date: 11th of May
+
 t0 = time.time()
 
 ## Downloading the fasta and metadata files via Rsync

@@ -33,3 +33,5 @@ Corona/Data/Clusters/SARSCoV2_998.fasta
 Corona/Data/Clusters/SARSCoV2_9985.fasta
 Corona/Data/Clusters/SARSCoV2_9995.fasta
 .DS_Store
+Influenza/Data/NCBI/influenza.fna
+Influenza/Data/NCBI/influenza_na.dat

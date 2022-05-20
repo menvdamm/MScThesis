@@ -82,7 +82,7 @@ subprocess.run(cmd, shell = True)
 
 with open('./Data/Structure/SARSCoV2001.element_string') as file:
     df['Element'] = list(file.readlines()[1].strip())
-    df.to_csv('./Data/Dataframes/df.csv', index = False)
+    
     
 df['Element'] = df['Element'].replace({"f": "5' unpaired",                
                                        "i": "interior loop & bulge",
@@ -91,6 +91,8 @@ df['Element'] = df['Element'].replace({"f": "5' unpaired",
                                        "h": "hairpin loop",
                                        "t": "3' unpaired"
                                        })
+
+df.to_csv('./Data/Dataframes/df.csv', index = False)
 
 #%% RUnning ViennaRNA forna server
 
