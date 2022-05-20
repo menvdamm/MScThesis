@@ -154,10 +154,10 @@ def find_rare_insertions(complete_df, metadata):
 # removing the positions from the complete df that have a gap percentage over the allowed gap percentage
 def ungap_df(complete_df, metadata):
     avg_length, df_length, allowed_gap_percentage = find_rare_insertions(complete_df, metadata)
-    print('\t \t Complete df length: '+len(complete_df)+'\n',
-          '\t \t Average length: '+avg_length+'\n'
-          '\t \t Ungapped df length: '+df_length+'\n',
-          '\t \t Allowed Gap Percentage: '+allowed_gap_percentage)
+    print('\t\t Complete df length: '+len(complete_df.index)+'\n',
+          '\t\t Average length: '+avg_length+'\n'
+          '\t\t Ungapped df length: '+df_length+'\n',
+          '\t\t Allowed Gap Percentage: '+allowed_gap_percentage)
     df = complete_df
     df = df[df['Gap_percentage'] < allowed_gap_percentage].sort_values('Position')
     df['Position'] = list(range(1, len(df)+1))
@@ -173,9 +173,53 @@ for Type in ['A','B']:
 
 #%% Dataframe per type
 
+def make_type_df(Type):
+    df = pd.DataFrame({'Position': [],
+                        'Segment': [],
+                        'Segment_position': [],
+                        'Mutability': [],
+                        'Shannon_entropy': [],
+                        'Gap_percentage': [],
+                        'A_percentage': [],
+                        'T_percentage': [],
+                        'G_percentage': [],
+                        'C_percentage': []})
+    length = 0
+    for Segment in list('12345678'):
+        df_Segment = globals()['complete_df_'+Type+'_'+Segment].copy()
+        df_Segment['Segment'] = [int(Segment)] * len(df_Segment)
+        df_Segment = df_Segment.rename({'Position': 'Segment_position'}, axis='columns')
+        df_Segment['Position']  = df_Segment['Segment_position'] + length
+        length = max(df_Segment['Position'])
+        df = df.append(df_Segment)
+    df['Position'] = df['Position'].astype('int64')
+    df['Segment'] = df['Segment'].astype('int64')
+    df['Segment_position'] = df['Segment_position'].astype('int64')
+    return df.sort_values('Position')
 
+for Type in ['A','B']:
+    globals()['df_'+Type] = make_type_df(Type)
+    globals()['df_'+Type].to_csv('./Data/Dataframes/df_'+Type+'.csv', index = False)   
 
+#%% Scoring 39 nucleotide regions
 
+def score_window(df, size):
+    Begin = pd.Series(list(range(0, len(df)-size+1)))
+    End = pd.Series(list(range(size-1, len(df))))
+    Mut_scores = pd.Series([sum(df['Mutability'][begin:end+1]) for begin, end in zip(Begin, End)])
+    Ent_scores = pd.Series([sum(df['Shannon_entropy'][begin:end+1]) for begin, end in zip(Begin, End)])
+    Gap_scores = pd.Series([sum(df['Gap_percentage'][begin:end+1]) for begin, end in zip(Begin, End)])
+    score_df = pd.DataFrame({'Begin_position': Begin + 1,
+                             'End_position': End + 1,     
+                             'Mutability': Mut_scores,
+                             'Shannon_entropy': Ent_scores,
+                             'Gap_percentage': Gap_scores})
+    score_df = score_df.sort_values('Mutability')
+    return score_df  
+
+for Type in ['A','B']:
+    globals()['score_df_'+Type] = score_window(globals()['df_'+Type], 39)
+    globals()['score_df_'+Type].to_csv('./Data/Dataframes/score_df_'+Type+'.csv', index = False)
 
 #%% Complete dataframe per segment
 
