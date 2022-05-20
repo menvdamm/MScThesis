@@ -50,7 +50,7 @@ def sort_IDs_by_date(IDs, metadata):
                         IDs_sorted.append(ID)  
     return IDs_sorted
         
-#%% Complete dataframe per segment
+#%% Complete dataframe
 
 def make_df(fasta, metadata):
     seq_dict = SeqIO.index(fasta, 'fasta')
@@ -149,7 +149,7 @@ def find_rare_insertions(complete_df, metadata):
 avg_length, df_length, allowed_gap_percentage = find_rare_insertions(complete_df, metadata)
 # 29784, 29783, 45
 
-#%% Ungapped dataframe per segment
+#%% Ungapped dataframe
 
 def ungap_df(df, allowed_gap_percentage):
     df = df[df['Gap_percentage'] < allowed_gap_percentage].sort_values('Position')

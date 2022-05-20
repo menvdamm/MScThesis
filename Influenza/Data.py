@@ -383,5 +383,20 @@ for ID in metadata_clean:
 len(metadata_clean)
 # 376098
     
-with open('./Data/Metadata/metadata.json', 'w') as file:
+with open('./Data/Metadata/metadata_clean.json', 'w') as file:
     json.dump(metadata_clean, file, default = str)
+
+# restructuring metadata
+metadata_new = {}
+for Type in ['A', 'B']:
+    metadata_new[Type] = {}
+    for Segment in list('12345678'):
+        metadata_new[Type][Segment] = {}
+
+for ID in metadata_clean:
+    Type = metadata_clean[ID]['Type']
+    Segment = metadata_clean[ID]['Segment']
+    metadata_new[Type][Segment] = metadata_clean[ID]
+    
+with open('./Data/Metadata/metadata.json', 'w') as file:
+    json.dump(metadata_new, file, default = str)
