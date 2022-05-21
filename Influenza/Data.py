@@ -327,7 +327,7 @@ for Type in ['A', 'B']:
 # B_7: 4540
 # B_8: 5559
 
-ambi_counts
+# ambi_counts
 # {'A': 
 #  {'1': 2011,
 #   '2': 2016,
@@ -396,7 +396,7 @@ for Type in ['A', 'B']:
 for ID in metadata_clean:
     Type = metadata_clean[ID]['Type']
     Segment = metadata_clean[ID]['Segment']
-    metadata_new[Type][Segment] = metadata_clean[ID]
+    metadata_new[Type][Segment][ID] = metadata_clean[ID]
     
 with open('./Data/Metadata/metadata.json', 'w') as file:
     json.dump(metadata_new, file, default = str)
