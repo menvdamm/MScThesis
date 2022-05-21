@@ -159,7 +159,7 @@ def ungap_df(df, allowed_gap_percentage):
 df = ungap_df(complete_df, allowed_gap_percentage)
 df.to_csv('./Data/Dataframes/df.csv', index = False)
 
-#%% Scoring 39 nucleotide regions
+#%% Scoring 30 nucleotide regions
 
 def score_window(df, size):
     Begin = pd.Series(list(range(0, len(df)-size+1)))
@@ -175,6 +175,6 @@ def score_window(df, size):
     score_df = score_df.sort_values('Mutability')
     return score_df  
 
-score_df = score_window(df, 39)
+score_df = score_window(df, 30)
 score_df.to_csv('./Data/Dataframes/score_df.csv', index = False)
 

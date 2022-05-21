@@ -284,7 +284,7 @@ for Type in ['A','B']:
     globals()['df_'+Type] = make_type_df(Type)
     globals()['df_'+Type].to_csv('./Data/Dataframes/df_'+Type+'.csv', index = False)   
 
-#%% Scoring 39 nucleotide regions
+#%% Scoring 30 nucleotide regions
 
 def score_window(df, size):
     Begin = pd.Series(list(range(0, len(df)-size+1)))
@@ -301,5 +301,5 @@ def score_window(df, size):
     return score_df  
 
 for Type in ['A','B']:
-    globals()['score_df_'+Type] = score_window(globals()['df_'+Type], 39)
+    globals()['score_df_'+Type] = score_window(globals()['df_'+Type], 30)
     globals()['score_df_'+Type].to_csv('./Data/Dataframes/score_df_'+Type+'.csv', index = False)

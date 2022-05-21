@@ -144,7 +144,7 @@ fig.update_layout(
 
 fig.show()
 
-#%% Histogram with most conserved 39b regions
+#%% Histogram with most conserved 30b regions
 
 fig = go.Figure()
 
@@ -165,7 +165,7 @@ for var in ['Mutability', 'Shannon_entropy']:
                 x = [row['Begin_position'], row['End_position']],
                 y = [-0.1, -0.1],
                 mode = 'lines',
-#                name = '39 bp',
+#                name = '30 bp',
                 line = dict(color = 'blue', width = 6),
                 showlegend = False))
 
@@ -177,7 +177,7 @@ fig.update_layout(
 
 fig.show()
 
-#%% Bar charts per 39b
+#%% Bar charts per 30b
 
 Color = ['#000000']*len(score_df)
 
@@ -195,7 +195,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Mutability per 39b for SARS-CoV-2',
+    title_text = 'Mutability per 30b for SARS-CoV-2',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Begin_position'}
     )
@@ -218,7 +218,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Shannon entropy per 39b for SARS-CoV-2',
+    title_text = 'Shannon entropy per 30b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Begin position'}
     )
@@ -226,12 +226,12 @@ fig.update_layout(
 # showing the Graph in browser
 fig.show()
 
-#%% Histograms per 39 bp
+#%% Histograms per 30 bp
     
 fig = px.histogram(score_df['Mutability'], nbins = 300)
 
 fig.update_layout(
-    title_text = 'Mutability histogram per 39b for SARS-CoV-2',
+    title_text = 'Mutability histogram per 30b for SARS-CoV-2',
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Mutability'}
     )
@@ -242,19 +242,19 @@ fig.show()
 fig = px.histogram(score_df['Shannon_entropy'], nbins = 300)
 
 fig.update_layout(
-    title_text = 'Shannon entropy histogram per 39b for SARS-CoV-2',
+    title_text = 'Shannon entropy histogram per 30b for SARS-CoV-2',
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Shannon entropy'}
     )
 
 fig.show()
 
-#%% Correlation between scores per 39 bp
+#%% Correlation between scores per 30 bp
 
 fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy") #, trendline="ols")
 
 fig.update_layout(
-    title_text = 'Shannon entropy in function of Mutability per 39b for SARS-CoV-2',
+    title_text = 'Shannon entropy in function of Mutability per 30b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )

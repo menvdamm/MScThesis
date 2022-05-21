@@ -94,10 +94,6 @@ df['Element'] = df['Element'].replace({"f": "5' unpaired",
 
 df.to_csv('./Data/Dataframes/df.csv', index = False)
 
-#%% RUnning ViennaRNA forna server
-
-
-
 
 
                 
