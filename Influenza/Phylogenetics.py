@@ -15,28 +15,28 @@ from Bio import SeqIO
 
 #%% Directories
 
+if not os.path.isdir('./Data/Clusters'): os.mkdir('./Data/Clusters')
 if not os.path.isdir('./Data/Tree'): os.mkdir('./Data/Tree')
-if not os.path.isdir('./Data/Tree/Clustered'): os.mkdir('./Data/Tree/Clustered')
 
 #%% Loading the necessary data
 
-with open('./Data/Metadata/metadata_human.json') as file:
-    metadata_human = json.load(file)
+with open('./Data/Metadata/metadata.json') as file:
+    metadata = json.load(file)
     
 #%% All clusterings
 
-# with open('Cluster_INFO.txt', 'w') as info_file:
+# with open('./Data/Clusters/Cluster_INFO.txt', 'w') as info_file:
 #     for Type in ['A', 'B']:
 #         for Segment in list('12345678'):
 #             info_file.write('Clustering '+Type+'_'+Segment+':\n')
 #             for identity in ['0.995', '0.99', '0.98', '0.97', '0.96', '0.95']:
-#                 input_file = './Data/Clean/Human/'+Type+'_'+Segment+'.fasta'
-#                 output_file = './Data/Tree/Clustered/'+Type+'_'+Segment+'.fasta'
+#                 input_file = './Data/Clean/'+Type+'_'+Segment+'.fasta'
+#                 output_file = './Data/Clusters/'+Type+'_'+Segment+'.fasta'
 #                 cmd = 'cd-hit-est -i '+input_file+' -o '+output_file+' -c '+identity+' -n 10 -T 0'
 #                 subprocess.run(cmd, shell = True)
 #                 cluster_count = 0
 #                 seq_counts = []
-#                 with open('./Data/Tree/Clustered/'+Type+'_'+Segment+'.fasta.clstr', 'r') as file:
+#                 with open('./Data/Clusters/'+Type+'_'+Segment+'.fasta.clstr', 'r') as file:
 #                     line_list = file.readlines()
 #                     for count in range(0, len(line_list)):
 #                         line = line_list[count]
@@ -92,8 +92,8 @@ print('Clustering took', round((t1-t0)/60, 1), 'minutes')
 #             records = SeqIO.parse(file, 'fasta')
 #             for seq_record in records:
 #                 ID = seq_record.id
-#                 metadata_cluster[Type][Segment][ID] = metadata_human[Type][Segment][ID]
-#                 Virus_name = metadata_human[Type][Segment][ID]['Virus_name']
+#                 metadata_cluster[Type][Segment][ID] = metadata[Type][Segment][ID]
+#                 Virus_name = metadata[Type][Segment][ID]['Virus_name']
 #                 if not Name_re.search(Virus_name):
 #                     wrong_names.append(ID)
 #                
@@ -166,7 +166,7 @@ for Type in ['A', 'B']:
             records = SeqIO.parse(file, 'fasta')
             for seq_record in records:              
                 ID = seq_record.id
-                metadata_cluster[Type][Segment][ID] = metadata_human[Type][Segment][ID]
+                metadata_cluster[Type][Segment][ID] = metadata[Type][Segment][ID]
                 Virus_name = metadata_cluster[Type][Segment][ID]['Virus_name']
                 if Name_re.search(Virus_name):
                     name = Name_re.search(Virus_name).group(1)
