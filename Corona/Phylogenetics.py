@@ -105,8 +105,8 @@ with open('./Data/Metadata/cluster_metadata.json', 'w') as f:
 with open('./Data/Tree/SARSCoV2.fasta', 'w') as f:
     for seq_record in SeqIO.parse('./Data/Alignment/SARSCoV2.fasta', 'fasta'):
         ID = seq_record.id
-        seq = str(seq_record.seq)
         if ID in cluster_metadata:
+            seq = str(seq_record.seq)
             name = cluster_metadata[ID]['Name']
             f.write('>' + name + '\n' + seq + '\n')
     

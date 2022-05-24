@@ -52,7 +52,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Gap percentage per position for the SARS-CoV-2 alignment',
+##    title_text = 'Gap percentage per position for the SARS-CoV-2 alignment',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Position'}
     )
@@ -78,7 +78,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Mutability per position for SARS-CoV-2',
+##    title_text = 'Mutability per position for SARS-CoV-2',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Position'}
     )
@@ -101,7 +101,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Shannon entropy per position for SARS-CoV-2',
+#    title_text = 'Shannon entropy per position for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Position'}
     )
@@ -114,7 +114,7 @@ fig.show()
 fig = px.histogram(df['Mutability'], nbins = 1000)
 
 fig.update_layout(
-    title_text = 'Mutability histogram for SARS-CoV-2',
+#    title_text = 'Mutability histogram for SARS-CoV-2',
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Mutability'}
     )
@@ -125,7 +125,7 @@ fig.show()
 fig = px.histogram(df['Shannon_entropy'], nbins = 1000)
 
 fig.update_layout(
-    title_text = 'Shannon entropy histogram for SARS-CoV-2',
+#    title_text = 'Shannon entropy histogram for SARS-CoV-2',
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Shannon entropy'}
     )
@@ -137,7 +137,7 @@ fig.show()
 fig = px.scatter(df, x="Mutability", y="Shannon_entropy") #, trendline="ols")
 
 fig.update_layout(
-    title_text = 'Shannon entropy in function of Mutability per position for SARS-CoV-2',
+#    title_text = 'Shannon entropy in function of Mutability per position for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )
@@ -169,7 +169,7 @@ for index, row in sdf.iterrows():
             showlegend = False))
 
 fig.update_layout(
-    title_text = 'Shannon entropy per position for SARS-CoV-2',
+#    title_text = 'Shannon entropy per position for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Position'}
     )
@@ -196,12 +196,12 @@ for index, row in sdf.iterrows():
             x = [row['Begin_position'], row['End_position']],
             y = [-0.1, -0.1],
             mode = 'lines',
-#                name = '30 bp',
+#           name = '30 bp',
             line = dict(color = 'blue', width = 6),
             showlegend = False))
 
 fig.update_layout(
-    title_text = 'Mutability per position for SARS-CoV-2',
+#    title_text = 'Mutability per position for SARS-CoV-2',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Position'}
     )
@@ -226,7 +226,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Mutability per 30b for SARS-CoV-2',
+#    title_text = 'Mutability per 30b for SARS-CoV-2',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Begin_position'}
     )
@@ -249,7 +249,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Shannon entropy per 30b for SARS-CoV-2',
+#    title_text = 'Shannon entropy per 30b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Begin position'}
     )
@@ -262,7 +262,7 @@ fig.show()
 fig = px.histogram(score_df['Mutability'], nbins = 300)
 
 fig.update_layout(
-    title_text = 'Mutability histogram per 30b for SARS-CoV-2',
+#    title_text = 'Mutability histogram per 30b for SARS-CoV-2',
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Mutability'}
     )
@@ -273,7 +273,7 @@ fig.show()
 fig = px.histogram(score_df['Shannon_entropy'], nbins = 300)
 
 fig.update_layout(
-    title_text = 'Shannon entropy histogram per 30b for SARS-CoV-2',
+#    title_text = 'Shannon entropy histogram per 30b for SARS-CoV-2',
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Shannon entropy'}
     )
@@ -285,7 +285,7 @@ fig.show()
 fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy") #, trendline="ols")
 
 fig.update_layout(
-    title_text = 'Shannon entropy in function of Mutability per 30b for SARS-CoV-2',
+#    title_text = 'Shannon entropy in function of Mutability per 30b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )
@@ -301,7 +301,7 @@ log_colors = np.log10(colors*1000 + 1)/max(np.log10(colors*10000 + 1))
 fig = px.histogram(log_colors, nbins = 300)
 
 fig.update_layout(
-    title_text = 'Color histogram for SARS-CoV-2',
+#    title_text = 'Color histogram for SARS-CoV-2',
     yaxis = {'title': 'Count'},
     xaxis = {'title': 'Color'}
     )
@@ -313,7 +313,7 @@ fig.show()
 fig = px.box(df, x="Element", y="Shannon_entropy")
 
 fig.update_layout(
-    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
+#    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Structure element'}
     )

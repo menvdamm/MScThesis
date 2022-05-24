@@ -10,7 +10,7 @@ Created on Fri Oct 15 13:32:43 2021
 
 # conda install -c bioconda cd-hit
 # conda install -c bioconda fasttree
-import time, os, subprocess, json, re
+import os, subprocess, json, re
 from Bio import SeqIO
 
 #%% Directories
@@ -49,31 +49,22 @@ with open('./Data/Metadata/metadata.json') as file:
 #                 info_file.write('\tIdentity: {} \n\t\tclusters: {}\n\t\tmax_seq: {}\n\t\tmin_seq: {}\n'.format(identity, cluster_count, max(seq_counts), min(seq_counts)))
 
 #%% Clustering
-t0 = time.time()
 
 for Type in ['A']:
     for Segment in list('12345678'):
         identity = '0.99'
-        input_file = './Data/Clean/Human/'+Type+'_'+Segment+'.fasta'
-        output_file = './Data/Tree/Clustered/'+Type+'_'+Segment+'_TEMP.fasta'
-        cmd = 'cd-hit-est -i '+input_file+' -o '+output_file+' -c '+identity+' -n 10'
+        input_file = './Data/Clean/'+Type+'_'+Segment+'.fasta'
+        output_file = './Data/Clusters/'+Type+'_'+Segment+'.fasta'
+        cmd = 'cd-hit-est -i '+input_file+' -o '+output_file+' -c '+identity+' -n 10 -T 0'
         subprocess.run(cmd, shell = True)
         
 for Type in ['B']:
     for Segment in list('12345678'):
         identity = '0.995'
-        input_file = './Data/Clean/Human/'+Type+'_'+Segment+'.fasta'
-        output_file = './Data/Tree/Clustered/'+Type+'_'+Segment+'_TEMP.fasta'
-        cmd = 'cd-hit-est -i '+input_file+' -o '+output_file+' -c '+identity+' -n 10'
+        input_file = './Data/Clean/'+Type+'_'+Segment+'.fasta'
+        output_file = './Data/Clusters/'+Type+'_'+Segment+'.fasta'
+        cmd = 'cd-hit-est -i '+input_file+' -o '+output_file+' -c '+identity+' -n 10 -T 0'
         subprocess.run(cmd, shell = True)
-
-# renaming the files
-for file in os.listdir('./Data/Tree/Clustered/'):
-    if file.endswith('.fasta.clstr') and not file.startswith('._'):
-        os.rename('./Data/Tree/Clustered/'+file, './Data/Tree/Clustered/'+file[0:3]+'.clstr')
-
-t1 = time.time()
-print('Clustering took', round((t1-t0)/60, 1), 'minutes')
 
 #%% Correcting wrong virus names
 
@@ -162,9 +153,8 @@ for Type in ['A', 'B']:
         metadata_cluster[Type][Segment] = {}
         names = []
         dupe_names = []
-        with open('./Data/Tree/Clustered/'+Type+'_'+Segment+'_TEMP.fasta', 'r') as file:
-            records = SeqIO.parse(file, 'fasta')
-            for seq_record in records:              
+        with open('./Data/Clusters/'+Type+'_'+Segment+'.fasta', 'r') as file:
+            for seq_record in SeqIO.parse(file, 'fasta'):              
                 ID = seq_record.id
                 metadata_cluster[Type][Segment][ID] = metadata[Type][Segment][ID]
                 Virus_name = metadata_cluster[Type][Segment][ID]['Virus_name']
@@ -224,8 +214,6 @@ for Type in ['A', 'B']:
                 if metadata_cluster[Type][Segment][ID]['Name'] in dupe_names:
                     metadata_cluster[Type][Segment][ID]['Name'] = metadata_cluster[Type][Segment][ID]['Name'] + '_' + ID
 
-## other option: just concatinate all names with their ID
-
 # writing the dictionary into .JSON files
     
 with open('./Data/Metadata/metadata_cluster.json', 'w') as file:
@@ -236,16 +224,17 @@ with open('./Data/Metadata/metadata_cluster.json', 'w') as file:
 
 for Type in ['A', 'B']:
     for Segment in list('12345678'):
-        new_fasta = './Data/Tree/'+Type+'_'+Segment+'.fasta'
-        with open(new_fasta, 'w') as new_fasta:
-            for ID in metadata_cluster[Type][Segment]:
-                Name = metadata_cluster[Type][Segment][ID]['Name']
-                Seq = metadata_cluster[Type][Segment][ID]['Aligned_sequence']
-                new_fasta.write('>' + Name + '\n' + Seq + '\n')
-        
+        with open('./Data/Tree/'+Type+'_'+Segment+'.fasta', 'w') as new_fasta:
+            with open('./Data/Aligned/'+Type+'_'+Segment+'.fasta', 'r') as f:
+                for seq_record in SeqIO.parse(f, 'fasta'):
+                    ID = seq_record.id
+                    if ID in metadata_cluster[Type][Segment]:
+                        seq = str(seq_record.seq)
+                        name = metadata_cluster[Type][Segment][ID]['Name']
+                        new_fasta.write('>' + name + '\n' + seq + '\n')
+ 
 #%% Creating a tree via FastTree
 
-t0 = time.time()
 
 for Type in ['A', 'B']:
     for Segment in list('12345678'):
@@ -253,6 +242,3 @@ for Type in ['A', 'B']:
         output_file = './Data/Tree/'+Type+'_'+Segment+'.tree'
         cmd = 'fasttree -nt -quote '+input_file+' > '+output_file
         subprocess.run(cmd, shell = True)
-
-t1 = time.time()
-print('Tree building took', round((t1-t0)/60, 1), 'minutes')
