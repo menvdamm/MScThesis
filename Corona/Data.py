@@ -169,9 +169,6 @@ bad_IDs = no_date_IDs + ambi_IDs + duplicate_IDs
 for ID in bad_IDs:
     del metadata_clean[ID]
     
-len(metadata_clean)
-# 376098
-
 for ID in metadata_clean:
     metadata_clean[ID]['Duplicate_IDs'] = dupes[ID]
     metadata_clean[ID]['Duplicate_count'] = len(dupes[ID])

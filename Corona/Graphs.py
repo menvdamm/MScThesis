@@ -111,7 +111,7 @@ fig.show()
 
 #%% Histograms
     
-fig = px.histogram(df['Mutability'], nbins = 300)
+fig = px.histogram(df['Mutability'], nbins = 1000)
 
 fig.update_layout(
     title_text = 'Mutability histogram for SARS-CoV-2',
@@ -122,7 +122,7 @@ fig.update_layout(
 fig.show()
     
 
-fig = px.histogram(df['Shannon_entropy'], nbins = 300)
+fig = px.histogram(df['Shannon_entropy'], nbins = 1000)
 
 fig.update_layout(
     title_text = 'Shannon entropy histogram for SARS-CoV-2',
@@ -144,7 +144,7 @@ fig.update_layout(
 
 fig.show()
 
-#%% Histogram with most conserved 30b regions
+#%% Bar chart with most conserved 30b regions
 
 fig = go.Figure()
 
@@ -157,21 +157,52 @@ fig.add_trace(
         marker_line_width = 0.05,
         showlegend = False))
         
-for var in ['Mutability', 'Shannon_entropy']:
-    sdf = score_df.sort_values(var)[0:10]
-    for index, row in sdf.iterrows():
-        fig.add_trace(
-            go.Scatter(
-                x = [row['Begin_position'], row['End_position']],
-                y = [-0.1, -0.1],
-                mode = 'lines',
+sdf = score_df.sort_values('Shannon_entropy')[0:10]
+for index, row in sdf.iterrows():
+    fig.add_trace(
+        go.Scatter(
+            x = [row['Begin_position'], row['End_position']],
+            y = [-0.1, -0.1],
+            mode = 'lines',
 #                name = '30 bp',
-                line = dict(color = 'blue', width = 6),
-                showlegend = False))
+            line = dict(color = 'blue', width = 6),
+            showlegend = False))
 
 fig.update_layout(
     title_text = 'Shannon entropy per position for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
+    xaxis = {'title': 'Position'}
+    )
+
+fig.show()
+
+
+fig = go.Figure()
+
+fig.add_trace(
+    go.Bar(
+        x = df['Position'],
+        y = df['Shannon_entropy'],
+        marker_color = 'black',
+        marker_line_color = 'black',
+        marker_line_width = 0.05,
+        showlegend = False))
+        
+
+sdf = score_df.sort_values('Mutability')[0:10]
+for index, row in sdf.iterrows():
+    fig.add_trace(
+        go.Scatter(
+            x = [row['Begin_position'], row['End_position']],
+            y = [-0.1, -0.1],
+            mode = 'lines',
+#                name = '30 bp',
+            line = dict(color = 'blue', width = 6),
+            showlegend = False))
+
+fig.update_layout(
+    title_text = 'Mutability per position for SARS-CoV-2',
+    yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Position'}
     )
 
@@ -261,16 +292,16 @@ fig.update_layout(
 
 fig.show()
 
-#%% RNA structure color histograms
+#%% RNA structure color histogram
 
 
 colors = df.sort_values('Position')['Mutability'].copy()
-log_colors = np.log10(colors*10000 + 1)/max(np.log10(colors*10000 + 1))
+log_colors = np.log10(colors*1000 + 1)/max(np.log10(colors*10000 + 1))
 
 fig = px.histogram(log_colors, nbins = 300)
 
 fig.update_layout(
-    title_text = 'Color histogram for for SARS-CoV-2',
+    title_text = 'Color histogram for SARS-CoV-2',
     yaxis = {'title': 'Count'},
     xaxis = {'title': 'Color'}
     )

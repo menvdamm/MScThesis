@@ -6,7 +6,7 @@ Created on Sat Apr 30 10:26:45 2022
 @author: mennovandamme
 """
 
-### Secondary RNA structure prediction
+### RNA secondary structure
 
 #%% Dependencies
 
@@ -25,7 +25,7 @@ with open('./Data/Dataframes/df.csv', 'r') as f:
     
 #%% Making consensus sequence 
 
-with open('./Data/Structure/SARSCoV2_consensus.fasta', 'w+') as file:
+with open('./Data/Structure/SARSCoV2_consensus.fasta', 'w') as file:
     seq = ''
     for row in df.sort_values('Position').iterrows():
         percentages = {'A': row[1]['A_percentage'],
@@ -34,7 +34,7 @@ with open('./Data/Structure/SARSCoV2_consensus.fasta', 'w+') as file:
                        'C': row[1]['C_percentage']}
         most_occuring = max(percentages, key = percentages.get)
         seq += most_occuring
-    file.write('>SARS-CoV-2' + '\n' + seq + '\n')
+    file.write('>SARS-CoV-2' + '\n' + seq)
 
 #%% RNA secondary structure prediction
 
@@ -50,7 +50,7 @@ with open('./Data/Structure/SARSCoV2.ifold', 'r') as f:
 # Making a file with sequence and structure
 
 with open('./Data/Structure/SARSCoV2_structure.txt', 'w') as file:         
-    file.write('>SARS-CoV-2' + '\n' + sequence + '\n' + structure + '\n')
+    file.write('>SARS-CoV-2' + '\n' + sequence + '\n' + structure)
 
 #%% Making a color file for visualization in ViennaRNA webbrowser
 
@@ -93,7 +93,3 @@ df['Element'] = df['Element'].replace({"f": "5' unpaired",
                                        })
 
 df.to_csv('./Data/Dataframes/df.csv', index = False)
-
-
-
-                
