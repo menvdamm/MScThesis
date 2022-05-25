@@ -18,7 +18,7 @@ from Bio import SeqIO
 #%% Directories
 
 if not os.path.isdir('./Data/Tree'): os.mkdir('./Data/Tree')
-if not os.path.isdir('./Data/Clustes'): os.mkdir('./Data/Clusters')
+if not os.path.isdir('./Data/Clusters'): os.mkdir('./Data/Clusters')
 
 #%% Loading the necessary data
 
@@ -29,14 +29,14 @@ with open('./Data/Metadata/metadata.json') as file:
 
 # Done on HPC: Cluster.sh
 
-with open('./Data/Clusteres/Cluster_INFO.txt', 'a') as info_file:
+with open('./Data/Clusters/Cluster_INFO.txt', 'w') as info_file:
     for identity in ['0.9995', '0.9985', '0.998','0.9975', '0.995', '0.99']:
         cluster_count = 0
-        with open('./Data/Clustered/SARSCoV2_'+identity[2:]+'.fasta.clstr', 'r') as f:
+        with open('./Data/Clusters/SARSCoV2_'+identity[2:]+'.fasta.clstr', 'r') as f:
             for line in f:
                 if line.startswith('>Cluster'):
                     cluster_count += 1
-        info_file.write('Identity: {} \n\t\tclusters: {}'.format(identity, cluster_count))
+        info_file.write('Identity: {} \n\tclusters: {}\n'.format(identity, cluster_count))
 
 # Identity: 0.9995 
 # 		clusters: 14684
@@ -59,15 +59,22 @@ for seq_record in SeqIO.parse('./Data/Clusters/SARSCoV2_9985.fasta', 'fasta'):
     ID = seq_record.id
     cluster_metadata[ID] = metadata[ID]
 
+
 for ID in cluster_metadata:
     des = cluster_metadata[ID]['Description']
-    if 'assembly' in des:
-        name = ID + ' genome assembly'
-    else: 
+    if any([i in des for i in ['SARS-CoV-2/', 'SARS-Cov-2/', 'hCoV-19/', 'BetaCoV/']]):
         des = des.split()
         for word in des:
             if any([i in word for i in ['SARS-CoV-2/', 'SARS-Cov-2/', 'hCoV-19/', 'BetaCoV/']]):
-                   name = word.strip(',')
+                name = word.strip(',')
+                splitname = name.split('/')  
+                if splitname[1] == 'human':
+                    name = '/'.join(name.split('/')[2:])
+                elif splitname[0] == 'hCoV-19':
+                    name = '/'.join(name.split('/')[1:])
+    else:
+        name = ID
+    name += '(' + cluster_metadata[ID]['Pangolin_class'] + ')'
     cluster_metadata[ID]['Name'] = name
 
 with open('./Data/Metadata/cluster_metadata.json', 'w') as f:

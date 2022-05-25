@@ -46,25 +46,6 @@ for identity in ['0.995', '0.99', '0.98', '0.97', '0.96', '0.95']:
     cluster_info[str(float(identity)*100)] = cluster_counts
                 
 cluster_info.to_csv('./Data/Clusters/cluster_info.csv', index = False)                   
-                
-                
-# with open('./Data/Clusters/Cluster_INFO.txt', 'w') as info_file:                
-
-#     for Type in ['A', 'B']:
-#         for Segment in list('12345678'):
-#             info_file.write('Clustering '+Type+'_'+Segment+':\n')
-            
-#             with open('./Data/Clusters/'+Type+'_'+Segment+'.fasta.clstr', 'r') as file:
-#                 line_list = file.readlines()
-#                 for count in range(len(line_list)):
-#                     line = line_list[count]
-#                     if line.startswith('>Cluster'):
-#                         cluster_count += 1
-#                         if cluster_count >= 1:
-#                             seq_counts.append(line_list[count-1].split()[0])
-#             seq_counts.append(line_list[-1].split()[0])
-#             seq_counts = list(map(int, seq_counts))
-#             info_file.write('\tIdentity: {}\n\t\tclusters: {}\n'.format(identity, cluster_count))
 
 #%% Clustering
 
@@ -85,73 +66,6 @@ for Type in ['B']:
         subprocess.run(cmd, shell = True)
 
 #%% Correcting wrong virus names
-
-# finding entries with wrong virus names
-#
-# Name_re = re.compile('\((.+)\)$')
-#
-# metadata_cluster = {}
-# wrong_names = []
-#
-# for Type in ['A', 'B']:
-#     metadata_cluster[Type] = {}
-#     for Segment in list('12345678'):
-#         metadata_cluster[Type][Segment] = {}
-#         with open('./Data/Tree/Clustered/'+Type+'_'+Segment+'_TEMP.fasta', 'r') as file:
-#             records = SeqIO.parse(file, 'fasta')
-#             for seq_record in records:
-#                 ID = seq_record.id
-#                 metadata_cluster[Type][Segment][ID] = metadata[Type][Segment][ID]
-#                 Virus_name = metadata[Type][Segment][ID]['Virus_name']
-#                 if not Name_re.search(Virus_name):
-#                     wrong_names.append(ID)
-#                
-# with open('wrong_names.txt', 'w') as file:
-#     for ID in wrong_names:
-#         file.write(ID+'\n')
-#         for key in ['Type', 'Subtype', 'Country', 'Year', 'Virus_name', 'Description']:
-#             file.write('\t'+key+': '+str(metadata_clean[ID][key])+'\n')
-
-# manually fixing the virus names of the wrong entries
-#
-# with open('./Data/Metadata/metadata_clean.json') as file:
-#    metadata_clean = json.load(file)
-#
-# Description_re = re.compile('^gi\|[0-9]+\|gb\|.*\|Influenza B/(.*)/(.*)/\d+')
-#
-# for ID in wrong_names:
-#     Type = metadata_clean[ID]['Type']
-#     Segment = metadata_clean[ID]['Segment']
-#     if Type == 'A':
-#         Country = metadata_clean[ID]['Country']
-#         Strain = 'unknown'
-#         Year = str(metadata_clean[ID]['Year'])
-#         Subtype = metadata_clean[ID]['Subtype']
-#         Name = Type+'/'+Country+'/'+Strain+'/'+Year+'('+Subtype+')'
-#         metadata_cluster[Type][Segment][ID]['Virus_name'] = 'Influenza A virus ('+Name+')'
-#     if Type == 'B':
-#         Description = metadata_clean[ID]['Description']
-#         if Description_re.search(Description):
-#             Place = Description_re.search(Description).group(1)
-#             Strain = Description_re.search(Description).group(2)
-#             Year = str(metadata_clean[ID]['Year'])
-#             Name = Type+'/'+Place+'/'+Strain+'/'+Year
-#             metadata_cluster[Type][Segment][ID]['Virus_name'] = 'Influenza B virus ('+Name+')'
-#         else:
-#             Country = metadata_clean[ID]['Country']
-#             Strain = 'unknown'
-#             Year = str(metadata_clean[ID]['Year'])  
-#             Name = Type+'/'+Country+'/'+Strain+'/'+Year
-#             metadata_cluster[Type][Segment][ID]['Virus_name'] = 'Influenza B virus ('+Name+')'
-
-# making a seperate metadata dictionary for the representative cluster sequences
-# finding and fixing wrong virus names:
-#       missing sample collection locations are replaced by collection country
-#       missing strain types are replaced by 'unknown'
-#       collection years that are represented by only the last 2 digits (eg 97) are replace by the full year (eg 1997)
-#       no accents (') allowed in FastTree algorithm => replaced by double accent (")  
-# concatinating duplicate names (per type & segment) with the seq ID
-# (duplicate names aren't accepted by the FastTree algorithm)
 
 Name_re = re.compile('\((.+)\)$')
 
