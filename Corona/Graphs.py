@@ -12,10 +12,8 @@ Created on Tue Oct 12 13:11:11 2021
 
 import pandas as pd
 import numpy as np
-# conda install -c plotly plotly
 import plotly.express as px
 import plotly.graph_objects as go
-# conda install statsmodels
 import plotly.io as pio
 
 
@@ -64,7 +62,7 @@ fig.show()
 
 Color = ['#000000']*len(df)
 
-# making animated Graph
+
 fig = px.bar(data_frame = df, 
              x = 'Position', y = 'Mutability',
              range_y = [0, max(df['Mutability'])],

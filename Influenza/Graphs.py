@@ -52,7 +52,6 @@ score_df = globals()['score_df_'+Type]
 
 Color = ['#000000']*len(complete_df)
 
-# making animated Graph
 fig = px.bar(data_frame = complete_df, 
              x = 'Position', y = 'Gap_percentage',
              range_y = [0, 100],
@@ -78,7 +77,6 @@ fig.show()
 
 Color = ['#000000']*len(df)
 
-# making animated Graph
 fig = px.bar(data_frame = df, 
              x = 'Position', y = 'Mutability',
              range_y = [0, max(df['Mutability'])],
@@ -101,7 +99,6 @@ fig.update_layout(
 fig.show()
 
 
-# making animated Graph
 fig = px.bar(data_frame = df, 
              x = 'Position', y = 'Shannon_entropy',
              range_y = [0, max(df['Shannon_entropy'])],
