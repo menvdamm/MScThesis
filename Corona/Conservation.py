@@ -192,10 +192,6 @@ with open('./Data/Genome/SARSCoV2_consensus.fasta', 'w') as file:
         consensus += most_occuring
     file.write('>SARS-CoV-2' + '\n' + consensus)
 
-for i in range(11):
-    b = complete_score_df[]
-    
-
 #%% Align CDS to consensus
 
 # manually downloaded coding sequences from NCBI SARS-CoV-2 reference sequence
