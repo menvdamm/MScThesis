@@ -230,7 +230,7 @@ fig.update_traces(marker_color = 'black',
 fig.update_layout(
 #    title_text = 'Mutability per 30b for SARS-CoV-2',
     yaxis = {'title': 'Mutability'},
-    xaxis = {'title': 'Begin_position'}
+    xaxis = {'title': 'Begin position'}
     )
 
 # showing the Graph in browser
@@ -312,7 +312,7 @@ fig.show()
 
 #%% Element structure Box plot
 
-fig = px.box(df, x="Element", y="Shannon_entropy")
+fig = px.box(df, x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
 
 fig.update_layout(
 #    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
@@ -324,7 +324,13 @@ fig.show()
 
 #%% Conservation bar chart with genome viewer
 
-metric = 'Shannon_entropy'
+metric = 'Mutability'
+
+if metric == 'Shannon_entropy':
+    y_cons = [2, 1, 1, 1, 1, 2, 2, 2, 1, 2]
+elif metric == 'Mutability':
+    y_cons = [2, 1, 1, 1, 1, 1, 2, 2, 1, 1]
+
 
 fig = make_subplots(rows = 2, 
                     cols = 1, 
@@ -338,7 +344,7 @@ fig.add_trace(
            y = df[metric],
            marker_color = 'black',
            marker_line_color = 'black',
-           marker_line_width = 0.5,
+           marker_line_width = 1,
            showlegend = False,
            name = ' '.join(metric.split('_')),
            ),
@@ -369,7 +375,7 @@ small_score_df = score_df.sort_values(metric).copy()[:][0:10]
 fig.add_trace(
     go.Bar(base = small_score_df['Begin_position'],
            x = small_score_df['End_position'].to_numpy() - small_score_df['Begin_position'].to_numpy() + 1, 
-           y = [2, 1, 1, 1, 1, 2, 2, 2, 1, 2], 
+           y = y_cons, 
            name = '', 
            showlegend = False,
            orientation = 'h',

@@ -124,7 +124,7 @@ fig.show()
 
 #%% Histograms
     
-fig = px.histogram(df['Mutability'], nbins = 1000)
+fig = px.histogram(df['Mutability'], nbins = 300)
 
 fig.update_layout(
 #    title_text = 'Mutability histogram for Influenza '+Type+' Segment '+Segment,
@@ -135,7 +135,7 @@ fig.update_layout(
 fig.show()
     
 
-fig = px.histogram(df['Shannon_entropy'], nbins = 1000)
+fig = px.histogram(df['Shannon_entropy'], nbins = 300)
 
 fig.update_layout(
 #    title_text = 'Shannon entropy histogram for Influenza '+Type+' Segment '+Segment,
@@ -239,7 +239,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Mutability per 30b for Influenza '+Type+' Segment '+Segment,
+#    title_text = 'Mutability per 30b for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Begin_position'}
     )
@@ -262,7 +262,7 @@ fig.update_traces(marker_color = 'black',
 
 # changing axis titles
 fig.update_layout(
-    title_text = 'Shannon entropy per 30b for Influenza '+Type+' Segment '+Segment,
+#    title_text = 'Shannon entropy per 30b for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Begin position'}
     )
@@ -275,7 +275,7 @@ fig.show()
 fig = px.histogram(score_df['Mutability'], nbins = 300)
 
 fig.update_layout(
-    title_text = 'Mutability histogram per 30b for Influenza '+Type+' Segment '+Segment,
+#    title_text = 'Mutability histogram per 30b for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Mutability'}
     )
@@ -286,7 +286,7 @@ fig.show()
 fig = px.histogram(score_df['Shannon_entropy'], nbins = 300)
 
 fig.update_layout(
-    title_text = 'Shannon entropy histogram per 30b for Influenza '+Type+' Segment '+Segment,
+#    title_text = 'Shannon entropy histogram per 30b for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Position count'},
     xaxis = {'title': 'Shannon entropy'}
     )
@@ -298,7 +298,7 @@ fig.show()
 fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy") #, trendline="ols")
 
 fig.update_layout(
-    title_text = 'Shannon entropy in function of Mutability per 30b for Influenza '+Type+' Segment '+Segment,
+#    title_text = 'Shannon entropy in function of Mutability per 30b for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )
@@ -314,7 +314,7 @@ log_colors = np.log10(colors*1000 + 1)/max(np.log10(colors*10000 + 1))
 fig = px.histogram(log_colors, nbins = 300)
 
 fig.update_layout(
-    title_text = 'Color histogram for Influenza '+Type+' Segment '+Segment,
+#    title_text = 'Color histogram for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Count'},
     xaxis = {'title': 'Color'}
     )
@@ -323,10 +323,10 @@ fig.show()
 
 #%% Element structure Box plot
 
-fig = px.box(df, x="Element", y="Shannon_entropy")
+fig = px.box(df, x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
 
 fig.update_layout(
-    title_text = 'RNA structure element Shannon entropy boxplot for for Influenza '+Type+' Segment '+Segment,
+#    title_text = 'RNA structure element Shannon entropy boxplot for for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Structure element'}
     )
@@ -335,7 +335,7 @@ fig.show()
 
 #%% Conservation bar chart with genome viewer
 
-metric = 'Shannon_entropy'
+metric = 'Mutability'
 
 if Type == 'A':
     y_CDS = [2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 2, 2, 1]
