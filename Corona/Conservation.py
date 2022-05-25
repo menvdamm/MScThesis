@@ -10,7 +10,7 @@ Created on Mon Nov 15 17:54:48 2021
 
 #%% Dependencies
 
-import json, os
+import json, os, subprocess
 import pandas as pd
 import numpy as np
 from Bio import SeqIO
@@ -18,6 +18,7 @@ from Bio import SeqIO
 #%% Directories
 
 if not os.path.isdir('./Data/Dataframes'): os.mkdir('./Data/Dataframes')
+if not os.path.isdir('./Data/Genome'): os.mkdir('./Data/Genome')
 
 #%% Loading the necessary data
 
@@ -175,6 +176,73 @@ def score_window(df, size):
     score_df = score_df.sort_values('Mutability')
     return score_df  
 
-score_df = score_window(df, 30)
-score_df.to_csv('./Data/Dataframes/score_df.csv', index = False)
+complete_score_df = score_window(df, 30)
+complete_score_df.to_csv('./Data/Dataframes/complete_score_df.csv', index = False)
 
+#%% Making consensus sequence 
+
+with open('./Data/Genome/SARSCoV2_consensus.fasta', 'w') as file:
+    consensus = ''
+    for row in df.sort_values('Position').iterrows():
+        percentages = {'A': row[1]['A_percentage'],
+                       'T': row[1]['T_percentage'],
+                       'G': row[1]['G_percentage'],
+                       'C': row[1]['C_percentage']}
+        most_occuring = max(percentages, key = percentages.get)
+        consensus += most_occuring
+    file.write('>SARS-CoV-2' + '\n' + consensus)
+
+for i in range(11):
+    b = complete_score_df[]
+    
+
+#%% Align CDS to consensus
+
+# manually downloaded coding sequences from NCBI SARS-CoV-2 reference sequence
+# https://www.ncbi.nlm.nih.gov/nuccore/1798174254?report=genbank
+# => './Data/Genome/CDS.fasta'
+
+CDS_file = './Data/Genome/CDS.fasta'
+consensus_file = './Data/Genome/SARSCoV2_consensus.fasta'
+output_file = './Data/Genome/SARSCoV2.fasta'
+cmd = 'mafft --auto  --preservecase --keeplength --addfragments '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
+subprocess.run(cmd, shell = True)
+
+#%% Extract positions of coding sequences
+
+begin_pos = []
+end_pos = []
+for seq_record in SeqIO.parse('./Data/Genome/SARSCoV2.fasta', 'fasta'):
+    ID = seq_record.id
+    if ID != 'SARS-CoV-2':
+        seq = str(seq_record.seq)
+        first = True
+        for i in range(len(seq)):
+            if seq[i] != '-' and first == True:
+                begin_pos.append(i+1)
+                first = False
+            if first == False and seq[i] == '-':
+                end_pos.append(i)
+                break
+                
+CDS_df = pd.DataFrame({'Begin_position': begin_pos,
+                       'End_position': end_pos,
+                       'Protein': ['ORF1ab', 'ORF1a', 'S', '3a', 'E', 'M', '6', '7a', '7b', '8', 'N', '10']})            
+
+CDS_df.to_csv('./Data/Genome/CDS_df.csv', index = False)
+
+#%% Filter out any 30bp regions that aren't completely in the coding regions
+
+def filter_scores(df, CDS_df):
+    coding_regions = []
+    for i in range(len(CDS_df)):
+        b = CDS_df['Begin_position'][i]
+        e = CDS_df['End_position'][i]
+        coding_regions += list(range(b, e + 1))
+    coding_regions = set(coding_regions)
+    df = df[df["Begin_position"].isin(coding_regions)]
+    score_df = df[df["End_position"].isin(coding_regions)]
+    return score_df  
+
+score_df = filter_scores(complete_score_df, CDS_df)
+score_df.to_csv('./Data/Dataframes/score_df.csv', index = False)
