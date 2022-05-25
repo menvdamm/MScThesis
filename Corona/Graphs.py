@@ -357,8 +357,8 @@ fig.add_trace(
            orientation = 'h',
            customdata = CDS_df['Protein'],
            texttemplate = "%{customdata}",
-           textposition = 'outside',
- #          insidetextanchor = 'middle',
+           textposition = 'inside',
+           insidetextanchor = 'middle',
            textangle = 0,
            ),
     row=2, col=1
@@ -379,7 +379,7 @@ fig.add_trace(
     row=2, col=1
 )
 
-fig.update_layout(barmode='stack', uniformtext_minsize=8, uniformtext_mode='show')
+fig.update_layout(barmode='stack', uniformtext_minsize=6, uniformtext_mode='show')
 
 fig.update_xaxes(title_text = 'Position', row = 2)
 fig.update_yaxes(title_text = ' '.join(metric.split('_')), row = 1, range = [0, max(df[metric])], fixedrange = True)

@@ -338,10 +338,10 @@ fig.show()
 metric = 'Shannon_entropy'
 
 if Type == 'A':
-    y_CDS = [2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2]
+    y_CDS = [2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 2, 2, 1]
     y_cons = [2]*10
 elif Type == 'B':
-    y_CDS = [2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2]
+    y_CDS = [2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 2]
     y_cons = [2]*10
 
 fig = make_subplots(rows = 2, 
@@ -356,7 +356,7 @@ fig.add_trace(
            y = df[metric],
            marker_color = 'black',
            marker_line_color = 'black',
-           marker_line_width = 0.25,
+           marker_line_width = 0.2,
            showlegend = False,
            name = ' '.join(metric.split('_')),
            ),
