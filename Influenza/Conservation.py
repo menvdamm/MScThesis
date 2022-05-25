@@ -20,6 +20,7 @@ from Bio import SeqIO
 if not os.path.isdir('./Data/Dataframes'): os.mkdir('./Data/Dataframes')
 if not os.path.isdir('./Data/Dataframes/Complete'): os.mkdir('./Data/Dataframes/Complete')
 if not os.path.isdir('./Data/Dataframes/Ungapped'): os.mkdir('./Data/Dataframes/Ungapped')
+if not os.path.isdir('./Data/Dataframes/Scores'): os.mkdir('./Data/Dataframes/Scores')
 
 #%% Loading the necessary data
 
@@ -284,7 +285,7 @@ for Type in ['A','B']:
     globals()['df_'+Type] = make_type_df(Type)
     globals()['df_'+Type].to_csv('./Data/Dataframes/df_'+Type+'.csv', index = False)   
 
-#%% Scoring 30 nucleotide regions
+#%% Scoring 30 nucleotide regions per segment
 
 def score_window(df, size):
     Begin = pd.Series(list(range(0, len(df)-size+1)))
@@ -301,5 +302,45 @@ def score_window(df, size):
     return score_df  
 
 for Type in ['A','B']:
-    globals()['score_df_'+Type] = score_window(globals()['df_'+Type], 30)
-    globals()['score_df_'+Type].to_csv('./Data/Dataframes/score_df_'+Type+'.csv', index = False)
+    for Segment in list('12345678'):
+        globals()['score_df_'+Type+'_'+Segment] = score_window(globals()['df_'+Type+'_'+Segment], 30)
+        globals()['score_df_'+Type+'_'+Segment].to_csv('./Data/Dataframes/Scores/df_'+Type+'_'+Segment+'.csv', index = False)
+        
+#%% Score dataframe per type        
+       
+# makes sure that there are no 30bp regions scored over 2 segments
+
+def make_type_score_df(Type):
+    df = pd.DataFrame({'Begin_position': [],
+                       'End_position': [],
+                        'Segment': [],
+                        'Segment_begin_position': [],
+                        'Segment_end_position': [],
+                        'Mutability': [],
+                        'Shannon_entropy': [],
+                        'Gap_percentage': []})
+    length = 0
+    for Segment in list('12345678'):
+        df_Segment = globals()['score_df_'+Type+'_'+Segment].copy()
+        df_Segment['Segment'] = [int(Segment)] * len(df_Segment)
+        df_Segment = df_Segment.rename({'Begin_position': 'Segment_begin_position'}, axis='columns')
+        df_Segment = df_Segment.rename({'End_position': 'Segment_end_position'}, axis='columns')
+        df_Segment['Begin_position']  = df_Segment['Segment_begin_position'] + length
+        df_Segment['End_position']  = df_Segment['Segment_end_position'] + length
+        length = max(df_Segment['End_position'])
+        df = df.append(df_Segment)
+    df['Begin_position'] = df['Begin_position'].astype('int64')
+    df['Begin_position'] = df['Begin_position'].astype('int64')
+    df['Segment'] = df['Segment'].astype('int64')
+    df['Segment_begin_position'] = df['Segment_begin_position'].astype('int64')
+    df['Segment_end_position'] = df['Segment_end_position'].astype('int64')
+    return df.sort_values('Mutability')
+
+for Type in ['A','B']:
+    globals()['df_'+Type] = make_type_score_df(Type)
+    globals()['df_'+Type].to_csv('./Data/Dataframes/df_'+Type+'.csv', index = False)  
+
+    
+    
+    
+    

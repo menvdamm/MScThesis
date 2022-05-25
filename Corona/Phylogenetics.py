@@ -29,54 +29,27 @@ with open('./Data/Metadata/metadata.json') as file:
 
 # Done on HPC: Cluster.sh
 
-# with open('./Data/Clusteres/Cluster_INFO.txt', 'a') as info_file:
-#     for identity in ['0.9995', '0.9985', '0.998','0.9975', '0.995', '0.99']:
-#         cluster_count = 0
-#         seq_counts = []
-#         with open('./Data/Clustered/SARSCoV2_'+identity[2:]+'.fasta.clstr', 'r') as file:
-#             line_list = file.readlines()
-#             for count in range(0, len(line_list)):
-#                 line = line_list[count]
-#                 if line.startswith('>Cluster'):
-#                     cluster_count += 1
-#                     if cluster_count >= 1:
-#                         seq_counts.append(line_list[count-1].split()[0])
-#         seq_counts.append(line_list[-1].split()[0])
-#         seq_counts = list(map(int, seq_counts))
-#         info_file.write('Identity: {} \n\t\tclusters: {}\n\t\tmax_seq: {}\n\t\tmin_seq: {}\n'.format(identity, cluster_count, max(seq_counts), min(seq_counts)))
-#         print('Identity: {} \n\t\tclusters: {}\n\t\tmax_seq: {}\n\t\tmin_seq: {}\n'.format(identity, cluster_count, max(seq_counts), min(seq_counts)))
+with open('./Data/Clusteres/Cluster_INFO.txt', 'a') as info_file:
+    for identity in ['0.9995', '0.9985', '0.998','0.9975', '0.995', '0.99']:
+        cluster_count = 0
+        with open('./Data/Clustered/SARSCoV2_'+identity[2:]+'.fasta.clstr', 'r') as f:
+            for line in f:
+                if line.startswith('>Cluster'):
+                    cluster_count += 1
+        info_file.write('Identity: {} \n\t\tclusters: {}'.format(identity, cluster_count))
 
 # Identity: 0.9995 
 # 		clusters: 14684
-# 		max_seq: 58819
-# 		min_seq: 0
-
 # Identity: 0.9985 
 # 		clusters: 301
-# 		max_seq: 148697
-# 		min_seq: 0
-
 # Identity: 0.998 
 # 		clusters: 185
-# 		max_seq: 243443
-# 		min_seq: 0
-
 # Identity: 0.9975 
 # 		clusters: 143
-# 		max_seq: 246232
-# 		min_seq: 0
-
 # Identity: 0.995 
 # 		clusters: 81
-# 		max_seq: 248315
-# 		min_seq: 0
-
 # Identity: 0.99 
 # 		clusters: 57
-# 		max_seq: 249218
-# 		min_seq: 0
-
-# => 0.9985 is probably best
 
 #%% Extracting virus name from sequence description
 
