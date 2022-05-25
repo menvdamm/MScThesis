@@ -14,7 +14,6 @@ import os, subprocess
 from Bio import SeqIO
 import pandas as pd
 import numpy as np
-import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.io as pio
@@ -27,11 +26,6 @@ pio.templates.default = "plotly_white"
 
 if not os.path.isdir('./Data/Genome'): os.mkdir('./Data/Genome')
 
-#%% Loading the necessary data
-
-with open('./Data/Dataframes/df.csv') as file:
-    df = pd.read_csv(file)
-
 #%% Alignment
 
 CDS_file = './Data/Genome/CDS.fasta'
@@ -40,7 +34,7 @@ output_file = './Data/Genome/SARSCoV2.fasta'
 cmd = 'mafft --auto  --preservecase --keeplength --addfragments '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
 subprocess.run(cmd, shell = True)
 
-#%% Extract positions
+#%% Extract positions of coding sequences
 
 begin_pos = []
 end_pos = []
@@ -63,15 +57,23 @@ CDS_df = pd.DataFrame({'Begin_position': begin_pos,
 
 CDS_df.to_csv('./Data/Genome/CDS_df.csv', index = False)
 
+#%% Loading the necessary data
+
+with open('./Data/Dataframes/df.csv') as file:
+    df = pd.read_csv(file)
+
+with open('./Data/Genome/CDS_df.csv') as file:
+    CDS_df = pd.read_csv(file)
+    
 #%% Make figure
 
 metric = 'Shannon_entropy'
 
-fig = make_subplots(rows=2, 
-                    cols=1, 
-                    shared_xaxes=True, 
-                    row_heights=[0.95, 0.05], 
-                    vertical_spacing=0.01,
+fig = make_subplots(rows = 2, 
+                    cols = 1, 
+                    shared_xaxes = True, 
+                    row_heights = [0.5, 0.5], 
+                    vertical_spacing = 0.01,
                     )
 
 fig.add_trace(
@@ -87,12 +89,17 @@ fig.add_trace(
 )
 
 fig.add_trace(
-    go.Bar(base=[0, 12000, 4000],
-           x=[4000, 5000, 7000], 
-           y=[1, 1, 2], 
-           name='', 
+    go.Bar(base = CDS_df['Begin_position'],
+           x = CDS_df['End_position'].to_numpy() - CDS_df['Begin_position'].to_numpy() + 1, 
+           y = [1, 2, 2, 1, 2, 2, 1, 1, 1, 1, 2, 1], 
+           name = '', 
            showlegend = False,
-           orientation='h',
+           orientation = 'h',
+           customdata = CDS_df['Protein'],
+           texttemplate = "%{customdata}",
+           textposition = "inside",
+           textangle = 0,
+           textfont_color = "black",
            ),
     row=2, col=1
 )
@@ -101,8 +108,7 @@ fig.update_layout(barmode='stack')
 
 fig.update_xaxes(title_text = 'Position', row = 2)
 fig.update_yaxes(title_text = ' '.join(metric.split('_')), row = 1, range = [0, max(df[metric])])
-fig.update_yaxes(visible=False, showticklabels=False, row = 2)
-                 
+fig.update_yaxes(visible = False, showticklabels = False, row = 2)             
 
 fig.show()
 
