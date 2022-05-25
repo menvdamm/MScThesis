@@ -10,7 +10,7 @@ Created on Mon Nov 15 17:54:48 2021
 
 #%% Dependencies
 
-import json, os
+import json, os, subprocess, re
 import pandas as pd
 import numpy as np
 from Bio import SeqIO
@@ -21,6 +21,9 @@ if not os.path.isdir('./Data/Dataframes'): os.mkdir('./Data/Dataframes')
 if not os.path.isdir('./Data/Dataframes/Complete'): os.mkdir('./Data/Dataframes/Complete')
 if not os.path.isdir('./Data/Dataframes/Ungapped'): os.mkdir('./Data/Dataframes/Ungapped')
 if not os.path.isdir('./Data/Dataframes/Scores'): os.mkdir('./Data/Dataframes/Scores')
+if not os.path.isdir('./Data/Genome'): os.mkdir('./Data/Genome')
+if not os.path.isdir('./Data/CDS'): os.mkdir('./Data/CDS')
+if not os.path.isdir('./Data/Consensus'): os.mkdir('./Data/Consensus')
 
 #%% Loading the necessary data
 
@@ -337,10 +340,119 @@ def make_type_score_df(Type):
     return df.sort_values('Mutability')
 
 for Type in ['A','B']:
-    globals()['df_'+Type] = make_type_score_df(Type)
-    globals()['df_'+Type].to_csv('./Data/Dataframes/df_'+Type+'.csv', index = False)  
+    globals()['complete_score_df_'+Type] = make_type_score_df(Type)
+    globals()['complete_score_df_'+Type].to_csv('./Data/Dataframes/complete_score_df_'+Type+'.csv', index = False)  
 
-    
-    
-    
-    
+#%% Making consensus sequence 
+
+# for Type in ['A','B']:
+#     with open('./Data/Genome/'+Type+'_consensus.fasta', 'w') as file:
+#         consensus = ''
+#         for row in globals()['df_'+Type].sort_values('Position').iterrows():
+#             percentages = {'A': row[1]['A_percentage'],
+#                            'T': row[1]['T_percentage'],
+#                            'G': row[1]['G_percentage'],
+#                            'C': row[1]['C_percentage']}
+#             most_occuring = max(percentages, key = percentages.get)
+#             consensus += most_occuring
+#         file.write('>' + Type + '\n' + consensus)
+        
+for Type in ['A','B']:
+    for Segment in list('12345678'):
+        with open('./Data/Genome/Consensus/'+Type+'_'+Segment+'.fasta', 'w') as file:
+            consensus = ''
+            for row in globals()['df_'+Type+'_'+Segment].sort_values('Position').iterrows():
+                percentages = {'A': row[1]['A_percentage'],
+                               'T': row[1]['T_percentage'],
+                               'G': row[1]['G_percentage'],
+                               'C': row[1]['C_percentage']}
+                most_occuring = max(percentages, key = percentages.get)
+                consensus += most_occuring
+            file.write('>' + Type + '_' + Segment + '\n' + consensus)  
+        
+#%% Align CDS to consensus
+
+# manually downloaded coding sequences from NCBI Influenza virus reference sequence
+# https://www.ncbi.nlm.nih.gov/nuccore/1798174254?report=genbank
+# => './Data/Genome/A_CDS.fasta' (M2 & NEP gene had to be split for proper alignment)
+# => './Data/Genome/B_CDS.fasta' (NEP gene had to be split for proper alignment)
+
+for Type in ['A','B']:
+     for Segment in list('12345678'):
+         CDS_file = './Data/Genome/'+Type+'_CDS.fasta'
+         consensus_file = './Data/Genome/'+Type+'_consensus.fasta'
+         output_file = './Data/Genome/'+Type+'.fasta'
+         cmd = 'mafft --auto  --preservecase --keeplength --addfragments '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
+         subprocess.run(cmd, shell = True) 
+
+
+# for Type in ['A','B']:
+#     for Segment in list('12345678'):
+#         CDS_file = './Data/Genome/'+Type+'_CDS.fasta'
+#         consensus_file = './Data/Genome/'+Type+'_consensus.fasta'
+#         output_file = './Data/Genome/'+Type+'.fasta'
+#         cmd = 'mafft --auto  --preservecase --keeplength --addfragments '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
+#         subprocess.run(cmd, shell = True)   
+
+# CDS_file = './Data/Genome/A_HA.fasta'
+# consensus_file = './Data/Genome/A_4_consensus.fasta'
+# output_file = './Data/Genome/A_4_aligned.fasta'
+# cmd = 'mafft --auto  --preservecase --keeplength --add '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
+# subprocess.run(cmd, shell = True)   
+
+# input_file = './Data/Genome/A_4_combined.fasta'
+# output_file = './Data/Genome/A_4_aligned.fasta'
+# cmd = 'mafft --thread -1 --auto --preservecase '+input_file+' > '+output_file
+# subprocess.run(cmd, shell = True)    
+
+#%% Extract positions of coding sequences
+
+protein_re = re.compile('\[gene=([^\]]*)\]')
+
+for Type in ['A','B']:
+    begin_pos = []
+    end_pos = []
+    proteins = []
+    for seq_record in SeqIO.parse('./Data/Genome/'+Type+'.fasta', 'fasta'):
+        ID = seq_record.id
+        if ID != Type:
+            protein = protein_re.search(seq_record.description).group(1)
+            proteins.append(protein)
+            seq = str(seq_record.seq)
+            for i in range(len(seq)):
+                 if seq[i] != '-':
+                     begin_pos.append(i+1)
+                     break
+            for i in range(len(seq)-1,0,-1):
+                 if seq[i] != '-':
+                     end_pos.append(i+1)
+                     break            
+    globals()['CDS_df_'+Type] = pd.DataFrame({'Begin_position': begin_pos,
+                                               'End_position': end_pos,
+                                               'Protein': proteins})                
+    globals()['CDS_df_'+Type].to_csv('./Data/Genome/CDS_df_'+Type+'.csv', index = False)        
+        
+#%% Filter out any 30bp regions that aren't completely in the coding regions
+
+def filter_scores(df, CDS_df):
+    coding_regions = []
+    for i in range(len(CDS_df)):
+        b = CDS_df['Begin_position'][i]
+        e = CDS_df['End_position'][i]
+        coding_regions += list(range(b, e + 1))
+    coding_regions = set(coding_regions)
+    df = df[df["Begin_position"].isin(coding_regions)]
+    score_df = df[df["End_position"].isin(coding_regions)]
+    return score_df  
+
+for Type in ['A','B']:
+    globals()['score_df_'+Type] = filter_scores(globals()['complete_score_df_'+Type], globals()['CDS_df_'+Type])
+    globals()['score_df_'+Type].to_csv('./Data/Dataframes/score_df_'+Type+'.csv', index = False)        
+        
+        
+        
+        
+        
+        
+        
+        

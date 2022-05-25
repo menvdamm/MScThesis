@@ -212,14 +212,14 @@ for seq_record in SeqIO.parse('./Data/Genome/SARSCoV2.fasta', 'fasta'):
     ID = seq_record.id
     if ID != 'SARS-CoV-2':
         seq = str(seq_record.seq)
-        first = True
         for i in range(len(seq)):
-            if seq[i] != '-' and first == True:
-                begin_pos.append(i+1)
-                first = False
-            if first == False and seq[i] == '-':
-                end_pos.append(i)
-                break
+             if seq[i] != '-':
+                 begin_pos.append(i+1)
+                 break
+        for i in range(len(seq)-1,0,-1):
+             if seq[i] != '-':
+                 end_pos.append(i+1)
+                 break 
                 
 CDS_df = pd.DataFrame({'Begin_position': begin_pos,
                        'End_position': end_pos,
