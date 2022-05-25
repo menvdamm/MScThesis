@@ -1,5 +1,7 @@
 Identity: 0.9995 
 	clusters: 14684
+Identity: 0.999 
+	clusters: 1117
 Identity: 0.9985 
 	clusters: 301
 Identity: 0.998 

@@ -30,7 +30,7 @@ with open('./Data/Metadata/metadata.json') as file:
 # Done on HPC: Cluster.sh
 
 with open('./Data/Clusters/Cluster_INFO.txt', 'w') as info_file:
-    for identity in ['0.9995', '0.9985', '0.998','0.9975', '0.995', '0.99']:
+    for identity in ['0.9995', '0.999', '0.9985', '0.998','0.9975', '0.995', '0.99']:
         cluster_count = 0
         with open('./Data/Clusters/SARSCoV2_'+identity[2:]+'.fasta.clstr', 'r') as f:
             for line in f:
@@ -40,6 +40,8 @@ with open('./Data/Clusters/Cluster_INFO.txt', 'w') as info_file:
 
 # Identity: 0.9995 
 # 		clusters: 14684
+# Identity: 0.999 
+# 	clusters: 1117
 # Identity: 0.9985 
 # 		clusters: 301
 # Identity: 0.998 
