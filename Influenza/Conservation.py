@@ -22,8 +22,9 @@ if not os.path.isdir('./Data/Dataframes/Complete'): os.mkdir('./Data/Dataframes/
 if not os.path.isdir('./Data/Dataframes/Ungapped'): os.mkdir('./Data/Dataframes/Ungapped')
 if not os.path.isdir('./Data/Dataframes/Scores'): os.mkdir('./Data/Dataframes/Scores')
 if not os.path.isdir('./Data/Genome'): os.mkdir('./Data/Genome')
-if not os.path.isdir('./Data/CDS'): os.mkdir('./Data/CDS')
-if not os.path.isdir('./Data/Consensus'): os.mkdir('./Data/Consensus')
+if not os.path.isdir('./Data/Genome/CDS'): os.mkdir('./Data//Genome/CDS')
+if not os.path.isdir('./Data/Genome/Consensus'): os.mkdir('./Data/Genome/Consensus')
+if not os.path.isdir('./Data/Genome/Aligned'): os.mkdir('./Data/Genome/Aligned')
 
 #%% Loading the necessary data
 
@@ -372,39 +373,19 @@ for Type in ['A','B']:
         
 #%% Align CDS to consensus
 
-# manually downloaded coding sequences from NCBI Influenza virus reference sequence
+# manually downloaded coding sequences from NCBI Influenza virus reference sequences
 # https://www.ncbi.nlm.nih.gov/nuccore/1798174254?report=genbank
-# => './Data/Genome/A_CDS.fasta' (M2 & NEP gene had to be split for proper alignment)
-# => './Data/Genome/B_CDS.fasta' (NEP gene had to be split for proper alignment)
+# (for A: M2 & NEP gene had to be split for proper alignment)
+# (for B: NEP gene had to be split for proper alignment)
 
 for Type in ['A','B']:
      for Segment in list('12345678'):
-         CDS_file = './Data/Genome/'+Type+'_CDS.fasta'
-         consensus_file = './Data/Genome/'+Type+'_consensus.fasta'
-         output_file = './Data/Genome/'+Type+'.fasta'
+         CDS_file = './Data/Genome/CDS/'+Type+'_'+Segment+'.fasta'
+         consensus_file = './Data/Genome/Consensus/'+Type+'_'+Segment+'.fasta'
+         output_file = './Data/Genome/Aligned/'+Type+'_'+Segment+'.fasta'
          cmd = 'mafft --auto  --preservecase --keeplength --addfragments '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
          subprocess.run(cmd, shell = True) 
-
-
-# for Type in ['A','B']:
-#     for Segment in list('12345678'):
-#         CDS_file = './Data/Genome/'+Type+'_CDS.fasta'
-#         consensus_file = './Data/Genome/'+Type+'_consensus.fasta'
-#         output_file = './Data/Genome/'+Type+'.fasta'
-#         cmd = 'mafft --auto  --preservecase --keeplength --addfragments '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
-#         subprocess.run(cmd, shell = True)   
-
-# CDS_file = './Data/Genome/A_HA.fasta'
-# consensus_file = './Data/Genome/A_4_consensus.fasta'
-# output_file = './Data/Genome/A_4_aligned.fasta'
-# cmd = 'mafft --auto  --preservecase --keeplength --add '+CDS_file+' --reorder --thread -1 '+consensus_file+' > '+output_file
-# subprocess.run(cmd, shell = True)   
-
-# input_file = './Data/Genome/A_4_combined.fasta'
-# output_file = './Data/Genome/A_4_aligned.fasta'
-# cmd = 'mafft --thread -1 --auto --preservecase '+input_file+' > '+output_file
-# subprocess.run(cmd, shell = True)    
-
+         
 #%% Extract positions of coding sequences
 
 protein_re = re.compile('\[gene=([^\]]*)\]')
@@ -413,24 +394,30 @@ for Type in ['A','B']:
     begin_pos = []
     end_pos = []
     proteins = []
-    for seq_record in SeqIO.parse('./Data/Genome/'+Type+'.fasta', 'fasta'):
-        ID = seq_record.id
-        if ID != Type:
-            protein = protein_re.search(seq_record.description).group(1)
-            proteins.append(protein)
-            seq = str(seq_record.seq)
-            for i in range(len(seq)):
-                 if seq[i] != '-':
-                     begin_pos.append(i+1)
-                     break
-            for i in range(len(seq)-1,0,-1):
-                 if seq[i] != '-':
-                     end_pos.append(i+1)
-                     break            
+    df = globals()['df_'+Type]
+    for Segment in list('12345678'):
+        for seq_record in SeqIO.parse('./Data/Genome/Aligned/'+Type+'_'+Segment+'.fasta', 'fasta'):
+            ID = seq_record.id
+            if ID != Type + '_' + Segment:
+                protein = protein_re.search(seq_record.description).group(1)
+                proteins.append(protein)
+                seq = str(seq_record.seq)
+                for i in range(len(seq)):
+                     if seq[i] != '-':
+                         pos_df = df[['Position', 'Segment_position']][df['Segment'] == int(Segment)]
+                         b = pos_df[pos_df['Segment_position'] == i+1]['Position'].values[0]
+                         begin_pos.append(b)
+                         break
+                for i in range(len(seq)-1,0,-1):
+                     if seq[i] != '-':
+                         pos_df = df[['Position', 'Segment_position']][df['Segment'] == int(Segment)]
+                         e = pos_df[pos_df['Segment_position'] == i+1]['Position'].values[0]
+                         end_pos.append(e)
+                         break            
     globals()['CDS_df_'+Type] = pd.DataFrame({'Begin_position': begin_pos,
-                                               'End_position': end_pos,
-                                               'Protein': proteins})                
-    globals()['CDS_df_'+Type].to_csv('./Data/Genome/CDS_df_'+Type+'.csv', index = False)        
+                                              'End_position': end_pos,
+                                              'Protein': proteins})                
+    globals()['CDS_df_'+Type].to_csv('./Data/Genome/CDS_df_'+Type+'.csv', index = False)            
         
 #%% Filter out any 30bp regions that aren't completely in the coding regions
 
@@ -448,11 +435,6 @@ def filter_scores(df, CDS_df):
 for Type in ['A','B']:
     globals()['score_df_'+Type] = filter_scores(globals()['complete_score_df_'+Type], globals()['CDS_df_'+Type])
     globals()['score_df_'+Type].to_csv('./Data/Dataframes/score_df_'+Type+'.csv', index = False)        
-        
-        
-        
-        
-        
         
         
         
