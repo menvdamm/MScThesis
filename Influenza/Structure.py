@@ -99,7 +99,7 @@ for Type in ['A', 'B']:
     for Segment in list('12345678'):   
         input_file = './Data/Structure/Consensus/'+Type+'_'+Segment+'.fasta'
         output_file = Type+'_'+Segment+'.ifold'
-        cmd = 'RNAfold -p0 -d2 --noLP --noPS --infile='+input_file+' --outfile='+output_file
+        cmd = 'RNAfold -p0 -d2 --noPS --infile='+input_file+' --outfile='+output_file
         subprocess.run(cmd, shell = True)
         # moving the produced .ifold file to the Dotbracket directory
         original = Type+'_'+Segment+'.ifold'

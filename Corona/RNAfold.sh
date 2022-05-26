@@ -10,4 +10,4 @@ cd $HOME/data
 module purge
 module load ViennaRNA
 
-RNAfold -p0 -d2 --noLP --noPS --infile=SARSCoV2_consensus.fasta --outfile=SARSCoV2.ifold
+RNAfold -p0 -d2 --noPS --infile=SARSCoV2_consensus.fasta --outfile=SARSCoV2.ifold
