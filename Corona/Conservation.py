@@ -242,3 +242,22 @@ def filter_scores(df, CDS_df):
 
 score_df = filter_scores(complete_score_df, CDS_df)
 score_df.to_csv('./Data/Dataframes/score_df.csv', index = False)
+
+#%% make csv for the top ten sequences per metric
+
+for metric in ['Shannon_entropy', 'Mutability']:
+    sequences = []
+    small_score_df = score_df.sort_values(metric)[0:10]
+    with open('./Data/Genome/SARSCoV2_consensus.fasta', 'r') as f:
+        consensus = f.readlines()[1]
+        for row in small_score_df.iterrows():
+            b = int(row[1]['Begin_position'])
+            e = int(row[1]['End_position'])  
+            seq = consensus[b:e+1]
+            sequences.append(seq)
+    small_score_df['Sequence'] = sequences
+    small_score_df.to_csv('./Data/Dataframes/small_score_df_'+metric+'.csv', index = False) 
+            
+                
+            
+            
