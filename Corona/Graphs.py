@@ -40,7 +40,6 @@ with open('./Data/Genome/CDS_df.csv') as file:
 
 Color = ['#000000']*len(complete_df)
 
-# making animated Graph
 fig = px.bar(data_frame = complete_df, 
              x = 'Position', y = 'Gap_percentage',
              range_y = [0, 100],
@@ -52,14 +51,12 @@ fig.update_traces(marker_color = 'black',
                   marker_line_color = 'black',
                   marker_line_width = 0.05)
 
-# changing axis titles
 fig.update_layout(
-##    title_text = 'Gap percentage per position for the SARS-CoV-2 alignment',
+#    title_text = 'Gap percentage per position for the SARS-CoV-2 alignment',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Position'}
     )
 
-# showing the Graph in browser
 fig.show()
 
 #%% Bar charts
@@ -78,18 +75,16 @@ fig.update_traces(marker_color = 'black',
                   marker_line_color = 'black',
                   marker_line_width = 0.05)
 
-# changing axis titles
+
 fig.update_layout(
-##    title_text = 'Mutability per position for SARS-CoV-2',
+#    title_text = 'Mutability per position for SARS-CoV-2',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Position'}
     )
 
-# showing the Graph in browser
 fig.show()
 
 
-# making animated Graph
 fig = px.bar(data_frame = df, 
              x = 'Position', y = 'Shannon_entropy',
              range_y = [0, max(df['Shannon_entropy'])],
@@ -101,14 +96,12 @@ fig.update_traces(marker_color = 'black',
                   marker_line_color = 'black',
                   marker_line_width = 0.05)
 
-# changing axis titles
 fig.update_layout(
 #    title_text = 'Shannon entropy per position for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Position'}
     )
 
-# showing the Graph in browser
 fig.show()
 
 #%% Histograms
@@ -117,8 +110,9 @@ fig = px.histogram(df['Mutability'], nbins = 1000)
 
 fig.update_layout(
 #    title_text = 'Mutability histogram for SARS-CoV-2',
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Mutability'}
+    yaxis = {'title': 'Number of positions'},
+    xaxis = {'title': 'Mutability'},
+    showlegend=False
     )
 
 fig.show()
@@ -128,8 +122,9 @@ fig = px.histogram(df['Shannon_entropy'], nbins = 1000)
 
 fig.update_layout(
 #    title_text = 'Shannon entropy histogram for SARS-CoV-2',
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Shannon entropy'}
+    yaxis = {'title': 'Number of positions'},
+    xaxis = {'title': 'Shannon entropy'},
+    showlegend=False
     )
 
 fig.show()
@@ -214,7 +209,6 @@ fig.show()
 
 Color = ['#000000']*len(score_df)
 
-# making animated Graph
 fig = px.bar(data_frame = score_df, 
              x = 'Begin_position', y = 'Mutability',
              range_y = [0, max(score_df['Mutability'])],
@@ -226,18 +220,15 @@ fig.update_traces(marker_color = 'black',
                   marker_line_color = 'black',
                   marker_line_width = 0.05)
 
-# changing axis titles
 fig.update_layout(
 #    title_text = 'Mutability per 30b for SARS-CoV-2',
     yaxis = {'title': 'Mutability'},
     xaxis = {'title': 'Begin position'}
     )
 
-# showing the Graph in browser
 fig.show()
 
 
-# making animated Graph
 fig = px.bar(data_frame = score_df, 
              x = 'Begin_position', y = 'Shannon_entropy',
              range_y = [0, max(score_df['Shannon_entropy'])],
@@ -249,35 +240,35 @@ fig.update_traces(marker_color = 'black',
                   marker_line_color = 'black',
                   marker_line_width = 0.05)
 
-# changing axis titles
 fig.update_layout(
 #    title_text = 'Shannon entropy per 30b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Begin position'}
     )
 
-# showing the Graph in browser
 fig.show()
 
 #%% Histograms per 30 bp
     
-fig = px.histogram(score_df['Mutability'], nbins = 300)
+fig = px.histogram(score_df['Mutability'], nbins = 1000)
 
 fig.update_layout(
 #    title_text = 'Mutability histogram per 30b for SARS-CoV-2',
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Mutability'}
+    yaxis = {'title': 'Number of candidates'},
+    xaxis = {'title': 'Mutability'},
+    showlegend=False
     )
 
 fig.show()
     
 
-fig = px.histogram(score_df['Shannon_entropy'], nbins = 300)
+fig = px.histogram(score_df['Shannon_entropy'], nbins = 1000)
 
 fig.update_layout(
 #    title_text = 'Shannon entropy histogram per 30b for SARS-CoV-2',
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Shannon entropy'}
+    yaxis = {'title': 'Number of candidates'},
+    xaxis = {'title': 'Shannon entropy'},
+    showlegend=False
     )
 
 fig.show()
@@ -324,13 +315,29 @@ fig.show()
 
 #%% Conservation bar chart with genome viewer
 
-metric = 'Mutability'
+# choose what you want to display
+
+amount_of_sequences = 10
+
+metric = 'Mutability' #'Shannon_entropy'
 
 if metric == 'Shannon_entropy':
-    y_cons = [2, 1, 1, 1, 1, 2, 2, 2, 1, 2]
+    y_cons = [2, 1, 1, 1, 1, 2, 2, 2, 1, 2] + [1]*1000
 elif metric == 'Mutability':
-    y_cons = [2, 1, 1, 1, 1, 1, 2, 2, 1, 1]
+    y_cons = [2, 1, 1, 1, 1, 1, 2, 2, 1, 1] + [1]*1000
 
+windowsize = 1 #30
+
+if windowsize == 1:
+    x = df['Position']
+    y = df[metric]
+    x_axis = 'Position'
+    line_thickness = 1
+elif windowsize == 30:
+    x = score_df['Begin_position']
+    y = score_df[metric]
+    x_axis = 'Begin position'
+    line_thickness = 0.5
 
 fig = make_subplots(rows = 2, 
                     cols = 1, 
@@ -340,11 +347,11 @@ fig = make_subplots(rows = 2,
                     )
 
 fig.add_trace(
-    go.Bar(x = df['Position'], 
-           y = df[metric],
+    go.Bar(x = x, 
+           y = y,
            marker_color = 'black',
            marker_line_color = 'black',
-           marker_line_width = 1,
+           marker_line_width = line_thickness,
            showlegend = False,
            name = ' '.join(metric.split('_')),
            ),
@@ -370,7 +377,7 @@ fig.add_trace(
     row=2, col=1
 )
 
-small_score_df = score_df.sort_values(metric).copy()[:][0:10]
+small_score_df = score_df.sort_values(metric)[0:amount_of_sequences]
 
 fig.add_trace(
     go.Bar(base = small_score_df['Begin_position'],
@@ -387,7 +394,7 @@ fig.add_trace(
 
 fig.update_layout(barmode='stack', uniformtext_minsize=6, uniformtext_mode='show')
 
-fig.update_xaxes(title_text = 'Position', row = 2)
+fig.update_xaxes(title_text = x_axis, row = 2)
 fig.update_yaxes(title_text = ' '.join(metric.split('_')), row = 1, range = [0, max(df[metric])], fixedrange = True)
 fig.update_yaxes(visible = False, showticklabels = False, row = 2, fixedrange = True)             
 

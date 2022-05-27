@@ -334,7 +334,7 @@ def make_type_score_df(Type):
         length = max(df_Segment['End_position'])
         df = df.append(df_Segment)
     df['Begin_position'] = df['Begin_position'].astype('int64')
-    df['Begin_position'] = df['Begin_position'].astype('int64')
+    df['End_position'] = df['End_position'].astype('int64')
     df['Segment'] = df['Segment'].astype('int64')
     df['Segment_begin_position'] = df['Segment_begin_position'].astype('int64')
     df['Segment_end_position'] = df['Segment_end_position'].astype('int64')
@@ -345,18 +345,6 @@ for Type in ['A','B']:
     globals()['complete_score_df_'+Type].to_csv('./Data/Dataframes/complete_score_df_'+Type+'.csv', index = False)  
 
 #%% Making consensus sequence 
-
-# for Type in ['A','B']:
-#     with open('./Data/Genome/'+Type+'_consensus.fasta', 'w') as file:
-#         consensus = ''
-#         for row in globals()['df_'+Type].sort_values('Position').iterrows():
-#             percentages = {'A': row[1]['A_percentage'],
-#                            'T': row[1]['T_percentage'],
-#                            'G': row[1]['G_percentage'],
-#                            'C': row[1]['C_percentage']}
-#             most_occuring = max(percentages, key = percentages.get)
-#             consensus += most_occuring
-#         file.write('>' + Type + '\n' + consensus)
         
 for Type in ['A','B']:
     for Segment in list('12345678'):
@@ -436,5 +424,26 @@ for Type in ['A','B']:
     globals()['score_df_'+Type] = filter_scores(globals()['complete_score_df_'+Type], globals()['CDS_df_'+Type])
     globals()['score_df_'+Type].to_csv('./Data/Dataframes/score_df_'+Type+'.csv', index = False)        
         
-        
+#%% make csv for the top ten per metric
+
+for metric in ['Shannon_entropy', 'Mutability']:
+    for Type in ['A','B']:
+        sequences = []
+        globals()['small_score_df_'+Type+'_'+metric] = globals()['score_df_'+Type].sort_values(metric)[0:10]
+        for row in globals()['small_score_df_'+Type+'_'+metric].iterrows():
+            Segment = str(int(row[1]['Segment']))
+            b = int(row[1]['Segment_begin_position'])
+            e = int(row[1]['Segment_end_position'])
+            with open('./Data/Genome/Consensus/'+Type+'_'+Segment+'.fasta', 'r') as f:
+                consensus = f.readlines()[1]
+                seq = consensus[b:e+1]
+                sequences.append(seq)
+        globals()['small_score_df_'+Type+'_'+metric]['Sequence'] = sequences
+        globals()['small_score_df_'+Type+'_'+metric].to_csv('./Data/Dataframes/small_score_df_'+Type+'_'+metric+'.csv', index = False) 
+            
+                
+            
+            
+
+     
         

@@ -124,23 +124,25 @@ fig.show()
 
 #%% Histograms
     
-fig = px.histogram(df['Mutability'], nbins = 300)
+fig = px.histogram(df['Mutability'], nbins = 1000)
 
 fig.update_layout(
 #    title_text = 'Mutability histogram for Influenza '+Type+' Segment '+Segment,
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Mutability'}
+    yaxis = {'title': 'Number of positions'},
+    xaxis = {'title': 'Mutability'},
+    showlegend=False
     )
 
 fig.show()
     
 
-fig = px.histogram(df['Shannon_entropy'], nbins = 300)
+fig = px.histogram(df['Shannon_entropy'], nbins = 1000)
 
 fig.update_layout(
 #    title_text = 'Shannon entropy histogram for Influenza '+Type+' Segment '+Segment,
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Shannon entropy'}
+    yaxis = {'title': 'Number of positions'},
+    xaxis = {'title': 'Shannon entropy'},
+    showlegend=False
     )
 
 fig.show()
@@ -272,23 +274,30 @@ fig.show()
 
 #%% Histograms per 30 bp
     
-fig = px.histogram(score_df['Mutability'], nbins = 300)
+fig = px.histogram(score_df.sort_values('Segment')['Mutability'], nbins = 1000, color = score_df.sort_values('Segment')['Segment'], labels={"color": "Segment"})
 
 fig.update_layout(
 #    title_text = 'Mutability histogram per 30b for Influenza '+Type+' Segment '+Segment,
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Mutability'}
+    yaxis = {'title': 'Number of candidates'},
+    xaxis = {'title': 'Mutability'},
+#    showlegend=False
     )
 
-fig.show()
-    
+fig.layout.yaxis.title.font = dict(size=20)
 
-fig = px.histogram(score_df['Shannon_entropy'], nbins = 300)
+fig.show()
+
+
+    
+#fig.update_yaxes(fontsize = 100)
+
+fig = px.histogram(score_df.sort_values('Segment')['Shannon_entropy'], nbins = 1000, color = score_df.sort_values('Segment')['Segment'], labels={"color": "Segment"})
 
 fig.update_layout(
-#    title_text = 'Shannon entropy histogram per 30b for Influenza '+Type+' Segment '+Segment,
-    yaxis = {'title': 'Position count'},
-    xaxis = {'title': 'Shannon entropy'}
+#    title_text = 'Shannon entropy histogram for Influenza '+Type+' Segment '+Segment,
+    yaxis = {'title': 'Number of candidates'},
+    xaxis = {'title': 'Shannon entropy'},
+#    showlegend=False
     )
 
 fig.show()
@@ -335,14 +344,31 @@ fig.show()
 
 #%% Conservation bar chart with genome viewer
 
+# choose what you want to display
+
+amount_of_sequences = 10
+
 metric = 'Mutability'
 
 if Type == 'A':
     y_CDS = [2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 2, 2, 1]
-    y_cons = [2]*10
+    y_cons = [2]*1000
 elif Type == 'B':
     y_CDS = [2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 2]
-    y_cons = [2]*10
+    y_cons = [2]*1000
+
+windowsize = 1 #30
+
+if windowsize == 1:
+    x = df['Position']
+    y = df[metric]
+    x_axis = 'Position'
+    line_thickness = 0.2
+elif windowsize == 30:
+    x = score_df['Begin_position']
+    y = score_df[metric]
+    x_axis = 'Begin position'
+    line_thickness = 0.1
 
 fig = make_subplots(rows = 2, 
                     cols = 1, 
@@ -352,11 +378,11 @@ fig = make_subplots(rows = 2,
                     )
 
 fig.add_trace(
-    go.Bar(x = df['Position'], 
-           y = df[metric],
+    go.Bar(x = x, 
+           y = y,
            marker_color = 'black',
            marker_line_color = 'black',
-           marker_line_width = 0.2,
+           marker_line_width = line_thickness,
            showlegend = False,
            name = ' '.join(metric.split('_')),
            ),
@@ -382,7 +408,7 @@ fig.add_trace(
     row=2, col=1
 )
 
-small_score_df = score_df.sort_values(metric).copy()[:][0:10]
+small_score_df = score_df.sort_values(metric)[0:amount_of_sequences]
 
 fig.add_trace(
     go.Bar(base = small_score_df['Begin_position'],
@@ -397,10 +423,25 @@ fig.add_trace(
     row=2, col=1
 )
 
-fig.update_layout(barmode='stack', uniformtext_minsize=8, uniformtext_mode='show')
+fig.update_layout(barmode='stack', uniformtext_minsize=6, uniformtext_mode='show')
 
-fig.update_xaxes(title_text = 'Position', row = 2)
+fig.update_xaxes(title_text = x_axis, row = 2)
 fig.update_yaxes(title_text = ' '.join(metric.split('_')), row = 1, range = [0, max(df[metric])], fixedrange = True)
 fig.update_yaxes(visible = False, showticklabels = False, row = 2, fixedrange = True)             
 
 fig.show()
+
+#%% average shannon entropy for each segment
+
+for Segment in list('12345678'): 
+    seg = int(Segment)
+    print(sum(df['Shannon_entropy'][df['Segment'] == seg]/len(df['Shannon_entropy'][df['Segment'] == seg])))
+
+  
+
+
+
+
+
+
+
