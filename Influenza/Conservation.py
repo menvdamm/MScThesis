@@ -302,7 +302,7 @@ def score_window(df, size):
                              'Mutability': Mut_scores,
                              'Shannon_entropy': Ent_scores,
                              'Gap_percentage': Gap_scores})
-    score_df = score_df.sort_values('Mutability')
+    score_df = score_df.sort_values('Begin_position')
     return score_df  
 
 for Type in ['A','B']:
@@ -338,7 +338,8 @@ def make_type_score_df(Type):
     df['Segment'] = df['Segment'].astype('int64')
     df['Segment_begin_position'] = df['Segment_begin_position'].astype('int64')
     df['Segment_end_position'] = df['Segment_end_position'].astype('int64')
-    return df.sort_values('Mutability')
+    df = df.sort_values('Begin_position').reset_index(drop=True)
+    return df
 
 for Type in ['A','B']:
     globals()['complete_score_df_'+Type] = make_type_score_df(Type)
@@ -410,14 +411,20 @@ for Type in ['A','B']:
 #%% Filter out any 30bp regions that aren't completely in the coding regions
 
 def filter_scores(df, CDS_df):
-    coding_regions = []
-    for i in range(len(CDS_df)):
-        b = CDS_df['Begin_position'][i]
-        e = CDS_df['End_position'][i]
-        coding_regions += list(range(b, e + 1))
-    coding_regions = set(coding_regions)
-    df = df[df["Begin_position"].isin(coding_regions)]
-    score_df = df[df["End_position"].isin(coding_regions)]
+    indices = []
+    proteins = []
+    for row in df.iterrows():
+        b = int(row[1]['Begin_position'])
+        e = int(row[1]['End_position'])  
+        for i in range(len(CDS_df)):
+            CDSb = CDS_df['Begin_position'][i]
+            CDSe = CDS_df['End_position'][i]
+            if CDSb <= b and e <= CDSe:
+                proteins.append(CDS_df['Protein'][i])
+                indices.append(row[0])
+                break
+    score_df = df.loc[indices]
+    score_df['Protein'] = proteins
     return score_df  
 
 for Type in ['A','B']:
@@ -441,7 +448,14 @@ for metric in ['Shannon_entropy', 'Mutability']:
         globals()['small_score_df_'+Type+'_'+metric]['Sequence'] = sequences
         globals()['small_score_df_'+Type+'_'+metric].to_csv('./Data/Dataframes/small_score_df_'+Type+'_'+metric+'.csv', index = False) 
             
-                
+#%% Average shannon entropy
+
+for Segment in list('12345678'): 
+    seg = int(Segment)
+    print(sum(df['Shannon_entropy'][df['Segment'] == seg]/len(df['Shannon_entropy'][df['Segment'] == seg])))
+
+  
+print(sum(df['Shannon_entropy']/len(df['Shannon_entropy'])))                
             
             
 

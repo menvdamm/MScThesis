@@ -431,14 +431,6 @@ fig.update_yaxes(visible = False, showticklabels = False, row = 2, fixedrange = 
 
 fig.show()
 
-#%% average shannon entropy for each segment
-
-for Segment in list('12345678'): 
-    seg = int(Segment)
-    print(sum(df['Shannon_entropy'][df['Segment'] == seg]/len(df['Shannon_entropy'][df['Segment'] == seg])))
-
-  
-
 
 
 

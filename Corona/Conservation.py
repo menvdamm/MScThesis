@@ -173,7 +173,7 @@ def score_window(df, size):
                              'Mutability': Mut_scores,
                              'Shannon_entropy': Ent_scores,
                              'Gap_percentage': Gap_scores})
-    score_df = score_df.sort_values('Mutability')
+    score_df = score_df.sort_values('Begin_position')
     return score_df  
 
 complete_score_df = score_window(df, 30)
@@ -230,14 +230,20 @@ CDS_df.to_csv('./Data/Genome/CDS_df.csv', index = False)
 #%% Filter out any 30bp regions that aren't completely in the coding regions
 
 def filter_scores(df, CDS_df):
-    coding_regions = []
-    for i in range(len(CDS_df)):
-        b = CDS_df['Begin_position'][i]
-        e = CDS_df['End_position'][i]
-        coding_regions += list(range(b, e + 1))
-    coding_regions = set(coding_regions)
-    df = df[df["Begin_position"].isin(coding_regions)]
-    score_df = df[df["End_position"].isin(coding_regions)]
+    indices = []
+    proteins = []
+    for row in df.iterrows():
+        b = int(row[1]['Begin_position'])
+        e = int(row[1]['End_position'])  
+        for i in range(len(CDS_df)):
+            CDSb = CDS_df['Begin_position'][i]
+            CDSe = CDS_df['End_position'][i]
+            if CDSb <= b and e <= CDSe:
+                proteins.append(CDS_df['Protein'][i])
+                indices.append(row[0])
+                break
+    score_df = df.loc[indices]
+    score_df['Protein'] = proteins
     return score_df  
 
 score_df = filter_scores(complete_score_df, CDS_df)
@@ -257,7 +263,33 @@ for metric in ['Shannon_entropy', 'Mutability']:
             sequences.append(seq)
     small_score_df['Sequence'] = sequences
     small_score_df.to_csv('./Data/Dataframes/small_score_df_'+metric+'.csv', index = False) 
+
             
-                
+#%% average shannon entropy            
             
-            
+print(sum(df['Shannon_entropy'])/len(df['Shannon_entropy']))
+ 
+print(sum(df['Mutability'])/len(df['Mutability']))      
+
+#%% average Shannon entropy per CDS
+
+# adding protein to conservation df per position
+proteins = []
+for row in df.iterrows():
+    pos = row[1]['Position']
+    CDS = False
+    for i in range(len(CDS_df)):
+        CDSb = CDS_df['Begin_position'][i]
+        CDSe = CDS_df['End_position'][i]
+        if CDSb <= pos and pos <= CDSe:
+            proteins.append(CDS_df['Protein'][i])
+            CDS = True
+            break
+    if CDS == False:
+        proteins.append('UTR')
+df['Protein'] = proteins
+df.to_csv('./Data/Dataframes/df.csv', index = False)
+
+for protein in list(set(df['Protein'])):
+    print(protein)
+    print(sum(df['Shannon_entropy'][df['Protein'] == protein]/len(df['Shannon_entropy'][df['Protein'] == protein])))
