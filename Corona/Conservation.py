@@ -261,7 +261,11 @@ for metric in ['Shannon_entropy', 'Mutability']:
             e = int(row[1]['End_position'])  
             seq = consensus[b:e+1]
             sequences.append(seq)
+    small_score_df['Positions'] = [str(b) + '-' + str(e) for b,e in zip(small_score_df['Begin_position'], small_score_df['End_position'])]
     small_score_df['Sequence'] = sequences
+    small_score_df['Shannon_entropy'] = round(small_score_df['Shannon_entropy'], 5)
+    small_score_df['Mutability'] = round(small_score_df['Mutability'], 5)
+    small_score_df['Gap_percentage'] = round(small_score_df['Gap_percentage'], 5)
     small_score_df.to_csv('./Data/Dataframes/small_score_df_'+metric+'.csv', index = False) 
 
             
@@ -293,3 +297,7 @@ df.to_csv('./Data/Dataframes/df.csv', index = False)
 for protein in list(set(df['Protein'])):
     print(protein)
     print(sum(df['Shannon_entropy'][df['Protein'] == protein]/len(df['Shannon_entropy'][df['Protein'] == protein])))
+
+
+
+

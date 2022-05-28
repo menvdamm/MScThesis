@@ -322,9 +322,9 @@ amount_of_sequences = 10
 metric = 'Mutability' #'Shannon_entropy'
 
 if metric == 'Shannon_entropy':
-    y_cons = [2, 1, 1, 1, 1, 2, 2, 2, 1, 2] + [1]*1000
+    y_cons = [2, 1, 1, 1, 1, 2, 2, 2, 1, 2] #+ [1]*1000
 elif metric == 'Mutability':
-    y_cons = [2, 1, 1, 1, 1, 1, 2, 2, 1, 1] + [1]*1000
+    y_cons = [2, 1, 1, 1, 2, 2, 1, 2, 2, 2] #+ [1]*1000
 
 windowsize = 1 #30
 

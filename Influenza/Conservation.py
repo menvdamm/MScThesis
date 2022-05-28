@@ -446,6 +446,9 @@ for metric in ['Shannon_entropy', 'Mutability']:
                 seq = consensus[b:e+1]
                 sequences.append(seq)
         globals()['small_score_df_'+Type+'_'+metric]['Sequence'] = sequences
+        globals()['small_score_df_'+Type+'_'+metric]['Shannon_entropy'] = round(globals()['small_score_df_'+Type+'_'+metric]['Shannon_entropy'], 5)
+        globals()['small_score_df_'+Type+'_'+metric]['Mutability'] = round(globals()['small_score_df_'+Type+'_'+metric]['Mutability'], 5)
+        globals()['small_score_df_'+Type+'_'+metric]['Gap_percentage'] = round(globals()['small_score_df_'+Type+'_'+metric]['Gap_percentage'], 5)
         globals()['small_score_df_'+Type+'_'+metric].to_csv('./Data/Dataframes/small_score_df_'+Type+'_'+metric+'.csv', index = False) 
             
 #%% Average shannon entropy
