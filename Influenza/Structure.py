@@ -13,6 +13,8 @@ Created on Tue May 24 18:07:53 2022
 import subprocess, os, shutil
 import pandas as pd
 import numpy as np
+from scipy import stats
+import scikit_posthocs as sp
 
 #%% Directories
 
@@ -189,26 +191,42 @@ for Type in ['A', 'B']:
 
 #%% Statistical testing
 
-## chi-squared goodness-of-fit test versus a random distribution
-
-# for Type in ['A', 'B']:
-#     # generating random data
-#     random_mutation_count = globals()['df_'+Type]['Mutation_count'].sample(frac=1).reset_index(drop=True)
-#     iterations = 5000
-#     count = 1
-#     while count < iterations:
-#         random_mutation_count += globals()['df_'+Type]['Mutation_count'].sample(frac=1).reset_index(drop=True)
-#         count += 1
-#     random_data = pd.DataFrame({'Random_mutation_count': random_mutation_count,
-#                                 'Element': globals()['df_'+Type]['Element']})   
-#     df = pd.DataFrame()
-#     df['Element_count'] = pd.DataFrame(globals()['df_'+Type][{'Element', 'Position'}].groupby(['Element']).count())
-#     # Mutation_count * iterations to get the same total count in Mutation_count & Random_mutation_count
-#     df['Mutation_count'] = pd.DataFrame(globals()['df_'+Type][{'Element', 'Mutation_count'}].groupby(['Element']).sum()) * iterations
-#     df['Random_mutation_count'] = pd.DataFrame(random_data.groupby(['Element']).sum())
-#     globals()['stat_df_'+Type] = df.copy()
-    
-# chisquare(f_obs = stat_df_A['Mutation_count'], f_exp = stat_df_A['Random_mutation_count'])
-
-# chisquare(f_obs = stat_df_B['Mutation_count'], f_exp = stat_df_B['Random_mutation_count'])
-     
+for Type in ['A', 'B']:
+    for metric in ['Shannon_entropy', 'Mutability']:
+        # Kruskal-Wallis Test 
+        stats.kruskal(globals()['df_'+Type][globals()['df_'+Type]['Element'] == "interior loop & bulge"][metric], 
+                      globals()['df_'+Type][globals()['df_'+Type]['Element'] == "stem"][metric],
+                      globals()['df_'+Type][globals()['df_'+Type]['Element'] == "multiloop"][metric],
+                      globals()['df_'+Type][globals()['df_'+Type]['Element'] == "hairpin loop"][metric],
+                      globals()['df_'+Type][globals()['df_'+Type]['Element'] == "5' unpaired"][metric], 
+                      globals()['df_'+Type][globals()['df_'+Type]['Element'] == "3' unpaired"][metric],
+                      )
+        
+        data = [globals()['df_'+Type][globals()['df_'+Type]['Element'] == "interior loop & bulge"][metric].values,
+                globals()['df_'+Type][globals()['df_'+Type]['Element'] == "stem"][metric].values,
+                globals()['df_'+Type][globals()['df_'+Type]['Element'] == "multiloop"][metric].values,
+                globals()['df_'+Type][globals()['df_'+Type]['Element'] == "hairpin loop"][metric].values,
+                globals()['df_'+Type][globals()['df_'+Type]['Element'] == "5' unpaired"][metric].values,
+                globals()['df_'+Type][globals()['df_'+Type]['Element'] == "3' unpaired"][metric].values,
+                ]
+        
+        # Dunn's test
+        res = sp.posthoc_dunn(data, p_adjust = 'bonferroni')
+        
+        print("Type: ", Type, " Metric: ", metric, "\n",
+              "adjusted p-value for i & s", '\t', round(res[1][2], 3) , '\n',
+              "adjusted p-value for i & m", '\t', round(res[1][3], 3) , '\n',
+              "adjusted p-value for i & h", '\t', round(res[1][4], 3) , '\n',
+              "adjusted p-value for i & 5'", '\t', round(res[1][5], 3) , '\n',
+              "adjusted p-value for i & 3'", '\t', round(res[1][6], 3) , '\n',
+              "adjusted p-value for s & m", '\t', round(res[2][3], 3) , '\n',
+              "adjusted p-value for s & h", '\t', round(res[2][4], 3) , '\n',
+              "adjusted p-value for s & 5'", '\t', round(res[2][5], 3) , '\n',
+              "adjusted p-value for s & 3'", '\t', round(res[2][6], 3) , '\n',
+              "adjusted p-value for m & h", '\t', round(res[3][4], 3) , '\n',
+              "adjusted p-value for m & 5'", '\t', round(res[3][5], 3) , '\n',
+              "adjusted p-value for m & 3'", '\t', round(res[3][6], 3) , '\n',
+              "adjusted p-value for h & 5'", '\t', round(res[4][5], 3) , '\n',
+              "adjusted p-value for h & 3'", '\t', round(res[4][6], 3) , '\n',
+              "adjusted p-value for 5' & 3'", '\t', round(res[5][6], 3) , '\n',
+              )

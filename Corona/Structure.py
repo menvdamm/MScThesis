@@ -13,6 +13,8 @@ Created on Sat Apr 30 10:26:45 2022
 import subprocess, os
 import pandas as pd
 import numpy as np
+from scipy import stats
+import scikit_posthocs as sp
 
 #%% Directories
 
@@ -93,3 +95,39 @@ df['Element'] = df['Element'].replace({"f": "5' unpaired",
                                        })
 
 df.to_csv('./Data/Dataframes/df.csv', index = False)
+
+#%% Structure - conservation link
+
+for metric in ['Shannon_entropy', 'Mutability']:
+    # Kruskal-Wallis Test 
+    stats.kruskal(df[df['Element'] == "interior loop & bulge"][metric], 
+                  df[df['Element'] == "stem"][metric],
+                  df[df['Element'] == "multiloop"][metric],
+                  df[df['Element'] == "hairpin loop"][metric],
+#                  df[df['Element'] == "5' unpaired"][metric], 
+                  )
+    
+    data = [df[df['Element'] == "interior loop & bulge"][metric].values,
+            df[df['Element'] == "stem"][metric].values,
+            df[df['Element'] == "multiloop"][metric].values,
+            df[df['Element'] == "hairpin loop"][metric].values,
+#            df[df['Element'] == "5' unpaired"][metric].values,
+            ]
+    
+    # Dunn's test
+    res = sp.posthoc_dunn(data, p_adjust = 'bonferroni')
+    
+    print(" Metric: ", metric, "\n",
+          "adjusted p-value for i & s", '\t', round(res[1][2], 3) , '\n',
+          "adjusted p-value for i & m", '\t', round(res[1][3], 3) , '\n',
+          "adjusted p-value for i & h", '\t', round(res[1][4], 3) , '\n',
+#          "adjusted p-value for i & 5'", '\t', round(res[1][5], 3) , '\n',
+          "adjusted p-value for s & m", '\t', round(res[2][3], 3) , '\n',
+          "adjusted p-value for s & h", '\t', round(res[2][4], 3) , '\n',
+#          "adjusted p-value for s & 5'", '\t', round(res[2][5], 3) , '\n',
+          "adjusted p-value for m & h", '\t', round(res[3][4], 3) , '\n',
+#          "adjusted p-value for m & 5'", '\t', round(res[3][5], 3) , '\n',
+#          "adjusted p-value for h & 5'", '\t', round(res[4][5], 3) , '\n',
+          )
+
+

@@ -313,6 +313,16 @@ fig.update_layout(
 
 fig.show()
 
+fig = px.box(df[df['Element'] != "5' unpaired"], x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
+
+fig.update_layout(
+#    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
+    yaxis = {'title': 'Shannon entropy'},
+    xaxis = {'title': 'Structure element'}
+    )
+
+fig.show()
+
 #%% Conservation bar chart with genome viewer
 
 # choose what you want to display
