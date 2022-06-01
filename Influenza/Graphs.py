@@ -283,7 +283,7 @@ fig.update_layout(
 #    showlegend=False
     )
 
-fig.layout.yaxis.title.font = dict(size=20)
+#fig.layout.yaxis.title.font = dict(size=20)
 
 fig.show()
 

@@ -275,7 +275,7 @@ fig.show()
 
 #%% Correlation between scores per 30 bp
 
-fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy") #, trendline="ols")
+fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy", color="Begin_position", labels={"Begin_position": "Begin position"})
 
 fig.update_layout(
 #    title_text = 'Shannon entropy in function of Mutability per 30b for SARS-CoV-2',
