@@ -14,6 +14,7 @@ import json, os, subprocess
 import pandas as pd
 import numpy as np
 from Bio import SeqIO
+from scipy import stats
 
 #%% Directories
 
@@ -275,7 +276,7 @@ print(sum(df['Shannon_entropy'])/len(df['Shannon_entropy']))
  
 print(sum(df['Mutability'])/len(df['Mutability']))      
 
-#%% average Shannon entropy per CDS
+#%% average & median Shannon entropy & mutability per CDS
 
 # adding protein to conservation df per position
 proteins = []
@@ -296,8 +297,21 @@ df.to_csv('./Data/Dataframes/df.csv', index = False)
 
 for protein in list(set(df['Protein'])):
     print(protein)
-    print(sum(df['Shannon_entropy'][df['Protein'] == protein]/len(df['Shannon_entropy'][df['Protein'] == protein])))
+    print('\tAverage Shannon entropy: ', round(np.average(df['Shannon_entropy'][df['Protein'] == protein]), 5))
+    print('\tAverage Mutability: ', round(np.average(df['Mutability'][df['Protein'] == protein]), 5))
+    print('\tMedian Shannon entropy: ', round(np.median(df['Shannon_entropy'][df['Protein'] == protein]), 5))
+    print('\tMedian Mutability: ', round(np.median(df['Mutability'][df['Protein'] == protein]), 5))
 
+print('Entire genome')
+print('\tAverage Shannon entropy: ', round(np.average(df['Shannon_entropy']), 5))
+print('\tAverage Mutability: ', round(np.average(df['Mutability']), 5))
+print('\tMedian Shannon entropy: ', round(np.median(df['Shannon_entropy']), 5))
+print('\tMedian Mutability: ', round(np.median(df['Mutability']), 5)) 
+   
+#%% correlation between Shannon entropy and mutability
 
+print(stats.spearmanr(df['Shannon_entropy'], df['Mutability']))
+
+print(stats.spearmanr(score_df['Shannon_entropy'], score_df['Mutability']))
 
 

@@ -14,6 +14,7 @@ import json, os, subprocess, re
 import pandas as pd
 import numpy as np
 from Bio import SeqIO
+from scipy import stats
 
 #%% Directories
 
@@ -431,7 +432,7 @@ for Type in ['A','B']:
     globals()['score_df_'+Type] = filter_scores(globals()['complete_score_df_'+Type], globals()['CDS_df_'+Type])
     globals()['score_df_'+Type].to_csv('./Data/Dataframes/score_df_'+Type+'.csv', index = False)        
         
-#%% make csv for the top ten per metric
+#%% Make csv for the top ten per metric
 
 for metric in ['Shannon_entropy', 'Mutability']:
     for Type in ['A','B']:
@@ -451,16 +452,31 @@ for metric in ['Shannon_entropy', 'Mutability']:
         globals()['small_score_df_'+Type+'_'+metric]['Gap_percentage'] = round(globals()['small_score_df_'+Type+'_'+metric]['Gap_percentage'], 5)
         globals()['small_score_df_'+Type+'_'+metric].to_csv('./Data/Dataframes/small_score_df_'+Type+'_'+metric+'.csv', index = False) 
             
-#%% Average shannon entropy
+#%% Average & median shannon entropy & mutability per segment
 
-for Segment in list('12345678'): 
-    seg = int(Segment)
-    print(sum(df['Shannon_entropy'][df['Segment'] == seg]/len(df['Shannon_entropy'][df['Segment'] == seg])))
+for Type in ['A','B']:
+    print(Type)
+    for Segment in list('12345678'): 
+        seg = int(Segment)
+        print(Segment)
+        print('\tAverage Shannon entropy: ', round(np.average(globals()['df_'+Type]['Shannon_entropy'][globals()['df_'+Type]['Segment'] == int(Segment)]), 5))
+        print('\tAverage Mutability: ', round(np.average(globals()['df_'+Type]['Mutability'][globals()['df_'+Type]['Segment'] == int(Segment)]), 5))
+        print('\tMedian Shannon entropy: ', round(np.median(globals()['df_'+Type]['Shannon_entropy'][globals()['df_'+Type]['Segment'] == int(Segment)]), 5))
+        print('\tMedian Mutability: ', round(np.median(globals()['df_'+Type]['Mutability'][globals()['df_'+Type]['Segment'] == int(Segment)]), 5))
+    
+    print('Entire genome')
+    print('\tAverage Shannon entropy: ', round(np.average(globals()['df_'+Type]['Shannon_entropy']), 5))
+    print('\tAverage Mutability: ', round(np.average(globals()['df_'+Type]['Mutability']), 5))
+    print('\tMedian Shannon entropy: ', round(np.median(globals()['df_'+Type]['Shannon_entropy']), 5))
+    print('\tMedian Mutability: ', round(np.median(globals()['df_'+Type]['Mutability']), 5))
+                
+#%% correlation between Shannon entropy and mutability
 
-  
-print(sum(df['Shannon_entropy']/len(df['Shannon_entropy'])))                
-            
-            
+for Type in ['A','B']:
+    print(Type)
+    print(stats.spearmanr(globals()['df_'+Type]['Shannon_entropy'], globals()['df_'+Type]['Mutability']))    
+    print(stats.spearmanr(globals()['score_df_'+Type]['Shannon_entropy'], globals()['score_df_'+Type]['Mutability']))
+
 
      
         
