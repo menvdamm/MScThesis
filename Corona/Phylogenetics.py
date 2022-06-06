@@ -57,7 +57,7 @@ with open('./Data/Clusters/Cluster_INFO.txt', 'w') as info_file:
 
 cluster_metadata = {}
 
-for seq_record in SeqIO.parse('./Data/Clusters/SARSCoV2_9980.fasta', 'fasta'):
+for seq_record in SeqIO.parse('./Data/Clusters/SARSCoV2_998.fasta', 'fasta'):
     ID = seq_record.id
     cluster_metadata[ID] = metadata[ID]
 
