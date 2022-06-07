@@ -16,7 +16,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
-
+from scipy import stats
 
 # setting the renderer to browser
 pio.renderers.default = 'browser'
@@ -303,7 +303,9 @@ fig.show()
 
 #%% Element structure Box plot
 
-fig = px.box(df, x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
+outliers_removed = df[df['Shannon_entropy'] < 0.001]
+
+fig = px.box(outliers_removed, x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
 
 fig.update_layout(
 #    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
