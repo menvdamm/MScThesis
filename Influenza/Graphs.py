@@ -10,6 +10,7 @@ Created on Tue Oct 12 13:11:11 2021
 
 #%% Dependencies
 
+import json
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -37,7 +38,9 @@ for Type in ['A', 'B']:
         with open('./Data/Dataframes/Complete/df_'+Type+'_'+Segment+'.csv') as file:
             globals()['complete_df_'+Type+'_'+Segment] = pd.read_csv(file)
         
-
+with open('./Data/Metadata/metadata.json') as file:
+    metadata = json.load(file)
+    
 #%% Choose type & segment to display data for
 
 Type = 'A'
@@ -431,6 +434,30 @@ fig.update_yaxes(visible = False, showticklabels = False, row = 2, fixedrange = 
 
 fig.show()
 
+#%% Collection years bar chart
+
+years = []
+
+for Segment in metadata['A']:
+    for ID in metadata['A'][Segment]:
+        years.append(metadata['A'][Segment][ID]['Year'])
+
+years_dict = {}    
+for year in set(years):
+    years_dict[year] = 0
+    
+for Segment in metadata['A']:
+    for ID in metadata['A'][Segment]:
+       years_dict[metadata['A'][Segment][ID]['Year']] += 1
+
+years_df = pd.DataFrame.from_dict(years_dict, orient = "index")
+
+fig = px.bar(data_frame = years_df, 
+             x = years_df.index,
+             y = years_df[0])
+
+# showing the Graph in browser
+fig.show()
 
 
 

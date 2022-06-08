@@ -16,7 +16,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
-from scipy import stats
+import json
 
 # setting the renderer to browser
 pio.renderers.default = 'browser'
@@ -35,6 +35,9 @@ with open('./Data/Dataframes/score_df.csv') as file:
 
 with open('./Data/Genome/CDS_df.csv') as file:
     CDS_df = pd.read_csv(file)
+    
+with open('./Data/Metadata/metadata.json', 'r') as file:
+    metadata = json.load(file)
 
 #%% Gap percentage
 
@@ -410,4 +413,28 @@ fig.update_xaxes(title_text = x_axis, row = 2)
 fig.update_yaxes(title_text = ' '.join(metric.split('_')), row = 1, range = [0, max(df[metric])], fixedrange = True)
 fig.update_yaxes(visible = False, showticklabels = False, row = 2, fixedrange = True)             
 
+fig.show()
+
+#%% Collection years bar chart
+
+years = []
+
+for ID in metadata:
+    years.append(metadata[ID]['Year'])
+
+years_dict = {}    
+for year in set(years):
+    years_dict[year] = 0
+    
+for ID in metadata:
+    years_dict[metadata[ID]['Year']] += 1
+       
+
+years_df = pd.DataFrame.from_dict(years_dict, orient = "index")
+
+fig = px.bar(data_frame = years_df, 
+             x = years_df.index,
+             y = years_df[0])
+
+# showing the Graph in browser
 fig.show()
