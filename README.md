@@ -3,7 +3,7 @@ Menno Van Damme
 
 This repository contains the code, data and results obtained during my thesis. Note that not all data is available here, the raw NCBI downloads, the SARS-CoV-2 fasta files and metadata json were to big to put on GitHub. The complete data is available on Zenodo: https://doi.org/10.5281/zenodo.6621827. If you only want to look at the results you don't really need these files.
 
-If you want to run the entire pipelie completely from scratch, the python scripts for Influenza should be run in this order:
+If you want to run the entire pipeline completely from scratch, the python scripts for Influenza should be run in this order:
 - Data.py
 - Alignment.py
 - Conservation.py
