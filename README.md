@@ -92,9 +92,9 @@ Data
 SARS-CoV-2:
 <pre>
 Data
-├── Alignment
+├── Alignment (not on GitHub, see Zenodo)
 │   └── SARSCoV2.fasta
-├── Clean
+├── Clean (not on GitHub, see Zenodo)
 │   ├── SARSCoV2.fasta
 │   └── SARSCoV2_ref.fasta
 ├── Clusters
@@ -127,11 +127,11 @@ Data
 │   └── SARSCoV2_consensus.fasta
 ├── Metadata
 │   ├── cluster_metadata.json
-│   ├── complete_metadata.json
-│   └── metadata.json
-├── NCBI
-│   ├── SARSCoV2.fasta
-│   ├── ncbi_dataset
+│   ├── complete_metadata.json (not on GitHub, see Zenodo)
+│   └── metadata.json (not on GitHub, see Zenodo)
+├── NCBI 
+│   ├── SARSCoV2.fasta (not on GitHub see Zenodo)
+│   ├── ncbi_dataset (not on GitHub or Zenodo, too large)
 │   │   └── data
 │   │       ├── biosample.jsonl
 │   │       ├── data_report.jsonl
