@@ -9,6 +9,7 @@ If you want to run the entire pipelie completely from scratch, the python script
 - Conservation.py
 - Phylogentics.py
 - Structure.py
+- Graphs.py
 
 Some of the SARS-CoV-2 steps had to be performed on the Ghent Univeristy supercomputer because of the large number of genome sequences and the length of the genome. These were the alignment, clustering and RNA secondary structure prediction. These are the .sh files in the SARSCoV2 directory.
 
@@ -19,13 +20,14 @@ The SARS-CoV-2 scripts should be run in this order:
 - Cluster.sh
 - Phylogenetics.py
 - Structure.py & RNAfold.sh
+- Graphs.py
 
 The data direcotories are structured like this:
 
 Influenza A & B:  
 For each type (A or B) and each segment (1, 2, 3, 4, 5, 6, 7, 8) there is often a seperate file, shortened tot type_segment.extension.  
 <pre>
-.
+Data
 ├── Aligned
 │   ├── type_segment.fasta
 ├── Clean
@@ -87,9 +89,9 @@ For each type (A or B) and each segment (1, 2, 3, 4, 5, 6, 7, 8) there is often 
     └── type_segment.tree
 </pre>
 
-For SARS-CoV-2:
+SARS-CoV-2:
 <pre>
-.
+Data
 ├── Alignment
 │   └── SARSCoV2.fasta
 ├── Clean
