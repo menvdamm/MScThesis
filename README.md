@@ -22,33 +22,8 @@ The SARS-CoV-2 scripts should be run in this order:
 
 The data direcotories are structured like this:
 
-Influenza A & B:
-Data
--  NCBI (not on GitHub, see Zenodo)
--  Sorted
--  Clean
--  Metadata
--  Aligned
--  Dataframes
--  Genome
--  Clusters
--  Tree
--  Structure
-
-SARS-CoV-2:
-Data
--  NCBI (not on GitHub, see Zenodo)
--  Clean (not on GitHub, see Zenodo)
--  Metadata
--  Alignment (not on GitHub, see Zenodo)
--  Dataframes
--  Genome
--  Clusters
--  Tree
--  Structure
-
-Influenza A & B:
-For each type (A or B) and each segment (1, 2, 3, 4, 5, 6, 7, 8) there is often a seperate file, shortened tot type_segment.extension.
+Influenza A & B:  
+For each type (A or B) and each segment (1, 2, 3, 4, 5, 6, 7, 8) there is often a seperate file, shortened tot type_segment.extension.  
 <pre>
 .
 ├── Aligned
@@ -112,6 +87,65 @@ For each type (A or B) and each segment (1, 2, 3, 4, 5, 6, 7, 8) there is often 
     └── type_segment.tree
 </pre>
 
-
+For SARS-CoV-2:
+<pre>
+.
+├── Alignment
+│   └── SARSCoV2.fasta
+├── Clean
+│   ├── SARSCoV2.fasta
+│   └── SARSCoV2_ref.fasta
+├── Clusters
+│   ├── Cluster_INFO.txt
+│   ├── SARSCoV2_99.fasta
+│   ├── SARSCoV2_99.fasta.clstr
+│   ├── SARSCoV2_995.fasta
+│   ├── SARSCoV2_995.fasta.clstr
+│   ├── SARSCoV2_9975.fasta
+│   ├── SARSCoV2_9975.fasta.clstr
+│   ├── SARSCoV2_998.fasta
+│   ├── SARSCoV2_998.fasta.clstr
+│   ├── SARSCoV2_9985.fasta
+│   ├── SARSCoV2_9985.fasta.clstr
+│   ├── SARSCoV2_999.fasta
+│   ├── SARSCoV2_999.fasta.clstr
+│   ├── SARSCoV2_9995.fasta
+│   └── SARSCoV2_9995.fasta.clstr
+├── Dataframes
+│   ├── complete_df.csv
+│   ├── complete_score_df.csv
+│   ├── df.csv
+│   ├── score_df.csv
+│   ├── small_score_df_Mutability.csv
+│   └── small_score_df_Shannon_entropy.csv
+├── Genome
+│   ├── CDS.fasta
+│   ├── CDS_df.csv
+│   ├── SARSCoV2.fasta
+│   └── SARSCoV2_consensus.fasta
+├── Metadata
+│   ├── cluster_metadata.json
+│   ├── complete_metadata.json
+│   └── metadata.json
+├── NCBI
+│   ├── SARSCoV2.fasta
+│   ├── ncbi_dataset
+│   │   └── data
+│   │       ├── biosample.jsonl
+│   │       ├── data_report.jsonl
+│   │       ├── dataset_catalog.json
+│   │       ├── genomic.fna
+│   │       └── virus_dataset.md
+│   └── ncbi_dataset.zip
+├── Structure
+│   ├── SARSCoV2.ifold
+│   ├── SARSCoV2001.element_string
+│   ├── SARSCoV2_consensus.fasta
+│   ├── SARSCoV2_structure.txt
+│   └── colors.txt
+└── Tree
+    ├── SARSCoV2.fasta
+    └── SARSCoV2.tree
+</pre>
 
 
