@@ -38,13 +38,13 @@ Data
 │   └── cluster_info.csv
 ├── Dataframes
 │   ├── Complete
-│   │   ├── df_type_segment.csv
+│   │   └── df_type_segment.csv
 │   ├── Scores
 │   │   ├── df_type.csv
-│   │   ├── df_type_segment.csv
+│   │   └── df_type_segment.csv
 │   ├── Ungapped
 │   │   ├── df_type.csv
-│   │   ├── df_type_segment.csv
+│   │   └── df_type_segment.csv
 │   ├── complete_score_df_type.csv
 │   ├── df_type.csv
 │   ├── score_df_type.csv
