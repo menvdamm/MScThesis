@@ -118,6 +118,11 @@ fig.update_layout(
     showlegend=False
     )
 
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
+
 fig.show()
     
 
@@ -130,6 +135,11 @@ fig.update_layout(
     showlegend=False
     )
 
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
+
 fig.show()
 
 #%% Correlation between scores
@@ -141,6 +151,11 @@ fig.update_layout(
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
@@ -262,6 +277,11 @@ fig.update_layout(
     showlegend=False
     )
 
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
+
 fig.show()
     
 
@@ -274,17 +294,27 @@ fig.update_layout(
     showlegend=False
     )
 
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
+
 fig.show()
 
 #%% Correlation between scores per 30 bp
 
-fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy", color="Begin_position", labels={"Begin_position": "Begin position"})
+fig = px.scatter(score_df, x="Mutability", y="Shannon_entropy", labels={"Begin_position": "Begin position"}) #, color="Begin_position", )
 
 fig.update_layout(
 #    title_text = 'Shannon entropy in function of Mutability per 30b for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
@@ -308,23 +338,33 @@ fig.show()
 
 outliers_removed = df[df['Shannon_entropy'] < 0.001]
 
-fig = px.box(outliers_removed, x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
+fig = px.box(outliers_removed[outliers_removed['Element'] != "5' unpaired"], x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
 
 fig.update_layout(
 #    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Structure element'}
     )
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
-fig = px.box(df[df['Element'] != "5' unpaired"], x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
+fig = px.box(df, x="Element", y="Shannon_entropy", category_orders={'Element': ["5' unpaired", "stem", "hairpin loop", "interior loop & bulge", "multiloop", "3' unpaired"]})
 
 fig.update_layout(
 #    title_text = 'RNA structure element Shannon entropy boxplot for for SARS-CoV-2',
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Structure element'}
     )
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
@@ -409,9 +449,16 @@ fig.add_trace(
 
 fig.update_layout(barmode='stack', uniformtext_minsize=6, uniformtext_mode='show')
 
-fig.update_xaxes(title_text = x_axis, row = 2)
+
+fig.update_xaxes(title_text = x_axis, row = 2, title_font_size = 30, tickfont_size = 20)
 fig.update_yaxes(title_text = ' '.join(metric.split('_')), row = 1, range = [0, max(df[metric])], fixedrange = True)
 fig.update_yaxes(visible = False, showticklabels = False, row = 2, fixedrange = True)             
+fig.update_layout(uniformtext_minsize=20)
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 

@@ -136,6 +136,11 @@ fig.update_layout(
     showlegend=False
     )
 
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
+
 fig.show()
     
 
@@ -148,6 +153,11 @@ fig.update_layout(
     showlegend=False
     )
 
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
+
 fig.show()
 
 #%% Correlation between scores
@@ -159,6 +169,11 @@ fig.update_layout(
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
@@ -277,31 +292,39 @@ fig.show()
 
 #%% Histograms per 30 bp
     
-fig = px.histogram(score_df.sort_values('Segment')['Mutability'], nbins = 1000, color = score_df.sort_values('Segment')['Segment'], labels={"color": "Segment"})
+fig = px.histogram(score_df.sort_values('Segment')['Mutability'], nbins = 1000) #, color = score_df.sort_values('Segment')['Segment'], labels={"color": "Segment"})
 
 fig.update_layout(
 #    title_text = 'Mutability histogram per 30b for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Number of candidates'},
     xaxis = {'title': 'Mutability'},
-#    showlegend=False
+    showlegend=False
     )
 
-#fig.layout.yaxis.title.font = dict(size=20)
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
-
 
     
 #fig.update_yaxes(fontsize = 100)
 
-fig = px.histogram(score_df.sort_values('Segment')['Shannon_entropy'], nbins = 1000, color = score_df.sort_values('Segment')['Segment'], labels={"color": "Segment"})
+fig = px.histogram(score_df.sort_values('Segment')['Shannon_entropy'], nbins = 1000) #, color = score_df.sort_values('Segment')['Segment'], labels={"color": "Segment"})
 
 fig.update_layout(
 #    title_text = 'Shannon entropy histogram for Influenza '+Type+' Segment '+Segment,
     yaxis = {'title': 'Number of candidates'},
     xaxis = {'title': 'Shannon entropy'},
-#    showlegend=False
+    showlegend=False
     )
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
@@ -314,6 +337,11 @@ fig.update_layout(
     yaxis = {'title': 'Shannon entropy'},
     xaxis = {'title': 'Mutability'}
     )
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
@@ -343,6 +371,11 @@ fig.update_layout(
     xaxis = {'title': 'Structure element'}
     )
 
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
+
 fig.show()
 
 #%% Conservation bar chart with genome viewer
@@ -351,7 +384,7 @@ fig.show()
 
 amount_of_sequences = 10
 
-metric = 'Mutability'
+metric = 'Shannon_entropy'
 
 if Type == 'A':
     y_CDS = [2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 2, 2, 1]
@@ -428,9 +461,15 @@ fig.add_trace(
 
 fig.update_layout(barmode='stack', uniformtext_minsize=6, uniformtext_mode='show')
 
-fig.update_xaxes(title_text = x_axis, row = 2)
+fig.update_xaxes(title_text = x_axis, row = 2, title_font_size = 30, tickfont_size = 20)
 fig.update_yaxes(title_text = ' '.join(metric.split('_')), row = 1, range = [0, max(df[metric])], fixedrange = True)
 fig.update_yaxes(visible = False, showticklabels = False, row = 2, fixedrange = True)             
+fig.update_layout(uniformtext_minsize=20)
+
+fig.layout.yaxis.title.font = dict(size=30)
+fig.layout.xaxis.title.font = dict(size=30)
+fig.layout.yaxis.tickfont = dict(size=20)
+fig.layout.xaxis.tickfont = dict(size=20)
 
 fig.show()
 
