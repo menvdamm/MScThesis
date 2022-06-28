@@ -22,7 +22,7 @@ The SARS-CoV-2 scripts should be run in this order:
 - Structure.py & RNAfold.sh
 - Graphs.py
 
-The data direcotories are structured like this:
+The data directories are structured like this:
 
 Influenza A & B:  
 For each type (A or B) and each segment (1, 2, 3, 4, 5, 6, 7, 8) there is often a seperate file, shortened tot type_segment.extension.  
